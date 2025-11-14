@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 3: LED 패턴 만들기 - UTTEC AI Kit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #fff5f7 0%, #ffe5e5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(255, 50, 50, 0.15);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff5252 0%, #ff7979 50%, #ffa0a0 100%);
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .logo {
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .day-title {
+            font-size: 48px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: rgba(255,255,255,0.95);
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        .section {
+            margin-bottom: 50px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section-title {
+            font-size: 32px;
+            color: #ff5252;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 4px solid #ffa0a0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon {
+            font-size: 40px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .objective-list {
+            background: linear-gradient(135deg, #fff5f7 0%, #ffe8ec 100%);
+            padding: 30px;
+            border-radius: 20px;
+            border-left: 6px solid #ff5252;
+            margin-bottom: 30px;
+        }
+
+        .objective-list li {
+            font-size: 20px;
+            line-height: 2;
+            color: #333;
+            margin-left: 30px;
+            padding: 10px 0;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #ffffff 0%, #fff5f7 100%);
+            padding: 35px;
+            border-radius: 20px;
+            margin: 25px 0;
+            border: 3px solid #ffa0a0;
+            box-shadow: 0 10px 30px rgba(255, 82, 82, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .concept-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(255, 82, 82, 0.2);
+        }
+
+        .concept-box h3 {
+            color: #ff5252;
+            font-size: 26px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .concept-box p {
+            font-size: 19px;
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 15px;
+        }
+
+        .code-box {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            line-height: 1.6;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-box code {
+            color: #a6e22e;
+        }
+
+        .pattern-demo {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+        }
+
+        .led-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .demo-led {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid #ff5252;
+            transition: all 0.3s ease;
+        }
+
+        .demo-led.active {
+            background: #ff0000;
+            box-shadow: 0 0 30px #ff0000;
+            animation: glow 1s ease-in-out infinite;
+        }
+
+        .demo-led.inactive {
+            background: #ffcccc;
+            box-shadow: 0 0 5px #ffcccc;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px #ff0000; }
+            50% { box-shadow: 0 0 40px #ff0000; }
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, #ffe8ec 0%, #ffd4d9 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px 0;
+            border: 3px solid #ff5252;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .activity-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(255, 82, 82, 0.25);
+        }
+
+        .activity-card h4 {
+            color: #ff3333;
+            font-size: 24px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .activity-card ol, .activity-card ul {
+            margin-left: 25px;
+        }
+
+        .activity-card li {
+            font-size: 18px;
+            line-height: 1.9;
+            color: #333;
+            margin: 12px 0;
+            padding: 8px 0;
+        }
+
+        .challenge-box {
+            background: linear-gradient(135deg, #ff5252 0%, #ff7979 100%);
+            color: white;
+            padding: 35px;
+            border-radius: 20px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(255, 82, 82, 0.3);
+        }
+
+        .challenge-box h3 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .challenge-box ul {
+            margin-left: 25px;
+        }
+
+        .challenge-box li {
+            font-size: 19px;
+            line-height: 2;
+            margin: 12px 0;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            gap: 20px;
+        }
+
+        .nav-button {
+            flex: 1;
+            padding: 20px 30px;
+            border-radius: 15px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-button.prev {
+            background: linear-gradient(135deg, #ffa0a0 0%, #ff5252 100%);
+            color: white;
+        }
+
+        .nav-button.next {
+            background: linear-gradient(135deg, #ff5252 0%, #ff3333 100%);
+            color: white;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            text-align: center;
+            padding: 40px;
+            margin-top: 50px;
+        }
+
+        .footer-logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .footer p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 30px 20px;
+            }
+
+            .day-title {
+                font-size: 36px;
+            }
+
+            .section-title {
+                font-size: 26px;
+            }
+
+            .navigation {
+                flex-direction: column;
+            }
+
+            .led-row {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">(주)UTTEC - AI Kit 교육과정</div>
+            <div class="day-title">Day 3</div>
+            <div class="subtitle">LED 패턴 만들기</div>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🎯</span>
+                    학습 목표
+                </h2>
+                <div class="objective-list">
+                    <ul>
+                        <li>배열(Array)을 사용해서 여러 개의 LED 핀을 관리하기</li>
+                        <li>for 반복문으로 LED를 순차적으로 제어하기</li>
+                        <li>다양한 LED 점등 패턴 만들기 (순차, 역순, 왕복 등)</li>
+                        <li>창의적인 LED 효과를 디자인하는 방법 배우기</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">💡</span>
+                    핵심 개념
+                </h2>
+
+                <div class="concept-box">
+                    <h3>📦 배열(Array)이란?</h3>
+                    <p>
+                        배열은 여러 개의 값을 하나의 이름으로 관리할 수 있는 저장 공간이에요.
+                        마치 사물함처럼 번호가 매겨진 칸이 여러 개 있는 것과 같아요!
+                    </p>
+                    <p>
+                        LED가 3개 있다면, LED1, LED2, LED3 이렇게 따로 관리하는 대신
+                        <strong>led[0], led[1], led[2]</strong> 처럼 배열로 관리하면 훨씬 편리해요.
+                    </p>
+                    <div class="code-box">
+<code>// LED 핀 번호를 배열로 관리하기
+int ledPins[] = {2, 4, 5, 18, 19};  // 5개의 LED 핀
+
+// 배열의 크기 구하기
+int numLeds = sizeof(ledPins) / sizeof(ledPins[0]);</code>
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <h3>🔄 for 반복문으로 여러 LED 제어하기</h3>
+                    <p>
+                        배열과 for 반복문을 함께 사용하면 여러 개의 LED를 쉽게 제어할 수 있어요:
+                    </p>
+                    <div class="code-box">
+<code>// 모든 LED를 OUTPUT으로 설정
+for(int i = 0; i < numLeds; i++) {
+  pinMode(ledPins[i], OUTPUT);
+}
+
+// 모든 LED 켜기
+for(int i = 0; i < numLeds; i++) {
+  digitalWrite(ledPins[i], HIGH);
+}</code>
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <h3>🌟 순차 점등 패턴</h3>
+                    <p>LED가 하나씩 차례대로 켜지는 패턴을 만들어봐요:</p>
+                    <div class="pattern-demo">
+                        <div class="led-row">
+                            <div class="demo-led active"></div>
+                            <div class="demo-led inactive"></div>
+                            <div class="demo-led inactive"></div>
+                            <div class="demo-led inactive"></div>
+                            <div class="demo-led inactive"></div>
+                            <span style="font-size: 24px;">→</span>
+                        </div>
+                    </div>
+                    <div class="code-box">
+<code>void loop() {
+  // LED를 순서대로 켜기
+  for(int i = 0; i < numLeds; i++) {
+    digitalWrite(ledPins[i], HIGH);
+    delay(200);
+    digitalWrite(ledPins[i], LOW);
+  }
+}</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🔨</span>
+                    실습 활동
+                </h2>
+
+                <div class="activity-card">
+                    <h4>🚀 활동 1: 순차 점등 패턴</h4>
+                    <p>LED가 왼쪽에서 오른쪽으로 순서대로 켜지고 꺼지는 패턴을 만들어봐요!</p>
+                    <div class="code-box">
+<code>int ledPins[] = {2, 4, 5, 18, 19};
+int numLeds = 5;
+
+void setup() {
+  for(int i = 0; i < numLeds; i++) {
+    pinMode(ledPins[i], OUTPUT);
+  }
+}
+
+void loop() {
+  // 순차 점등
+  for(int i = 0; i < numLeds; i++) {
+    digitalWrite(ledPins[i], HIGH);
+    delay(200);
+    digitalWrite(ledPins[i], LOW);
+  }
+}</code>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h4>⬅️ 활동 2: 역순 점등 패턴</h4>
+                    <p>이번에는 오른쪽에서 왼쪽으로 LED가 켜지도록 만들어봐요!</p>
+                    <div class="code-box">
+<code>void loop() {
+  // 역순 점등
+  for(int i = numLeds - 1; i >= 0; i--) {
+    digitalWrite(ledPins[i], HIGH);
+    delay(200);
+    digitalWrite(ledPins[i], LOW);
+  }
+}</code>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h4>↔️ 활동 3: 왕복 패턴 (핑퐁)</h4>
+                    <p>LED가 왼쪽에서 오른쪽으로 갔다가 다시 왼쪽으로 돌아오는 패턴을 만들어봐요!</p>
+                    <div class="code-box">
+<code>void loop() {
+  // 왼쪽에서 오른쪽으로
+  for(int i = 0; i < numLeds; i++) {
+    digitalWrite(ledPins[i], HIGH);
+    delay(150);
+    digitalWrite(ledPins[i], LOW);
+  }
+
+  // 오른쪽에서 왼쪽으로
+  for(int i = numLeds - 1; i >= 0; i--) {
+    digitalWrite(ledPins[i], HIGH);
+    delay(150);
+    digitalWrite(ledPins[i], LOW);
+  }
+}</code>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h4>🌊 활동 4: 웨이브(물결) 패턴</h4>
+                    <p>LED가 꺼지지 않고 차례대로 켜지면서 물결처럼 보이는 효과를 만들어봐요!</p>
+                    <div class="code-box">
+<code>void loop() {
+  // 모든 LED 끄기
+  for(int i = 0; i < numLeds; i++) {
+    digitalWrite(ledPins[i], LOW);
+  }
+
+  // 하나씩 켜면서 이동
+  for(int i = 0; i < numLeds; i++) {
+    digitalWrite(ledPins[i], HIGH);
+    delay(200);
+  }
+
+  delay(500);
+}</code>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h4>✨ 활동 5: 반짝이는 패턴</h4>
+                    <p>모든 LED가 동시에 켜졌다 꺼졌다를 반복하는 패턴을 만들어봐요!</p>
+                    <div class="code-box">
+<code>void loop() {
+  // 모든 LED 켜기
+  for(int i = 0; i < numLeds; i++) {
+    digitalWrite(ledPins[i], HIGH);
+  }
+  delay(500);
+
+  // 모든 LED 끄기
+  for(int i = 0; i < numLeds; i++) {
+    digitalWrite(ledPins[i], LOW);
+  }
+  delay(500);
+}</code>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h4>🎭 활동 6: 안쪽에서 바깥쪽으로</h4>
+                    <p>가운데 LED부터 시작해서 양쪽으로 퍼지는 패턴을 만들어봐요!</p>
+                    <div class="code-box">
+<code>void loop() {
+  int center = numLeds / 2;
+
+  // 가운데 LED 켜기
+  digitalWrite(ledPins[center], HIGH);
+  delay(200);
+
+  // 양쪽으로 퍼지기
+  for(int i = 1; i <= center; i++) {
+    if(center - i >= 0) {
+      digitalWrite(ledPins[center - i], HIGH);
+    }
+    if(center + i < numLeds) {
+      digitalWrite(ledPins[center + i], HIGH);
+    }
+    delay(200);
+  }
+
+  delay(500);
+
+  // 모든 LED 끄기
+  for(int i = 0; i < numLeds; i++) {
+    digitalWrite(ledPins[i], LOW);
+  }
+  delay(300);
+}</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🚀</span>
+                    도전 과제
+                </h2>
+
+                <div class="challenge-box">
+                    <h3>🏆 스스로 해보기</h3>
+                    <ul>
+                        <li>🌟 2개씩 짝을 이루어 켜지는 패턴 만들기</li>
+                        <li>🌟🌟 홀수 번째 LED와 짝수 번째 LED가 번갈아가며 켜지는 패턴</li>
+                        <li>🌟🌟 랜덤하게 LED가 켜지는 패턴 (random() 함수 사용)</li>
+                        <li>🌟🌟🌟 경찰차 싸이렌처럼 좌우로 번갈아 깜빡이는 패턴</li>
+                        <li>🌟🌟🌟 속도가 점점 빨라지는 순차 점등 패턴</li>
+                        <li>🌟🌟🌟🌟 여러 가지 패턴을 조합한 나만의 LED 쇼 만들기</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">💡</span>
+                    창의력 키우기
+                </h2>
+
+                <div class="concept-box">
+                    <h3>🎨 나만의 패턴 디자인하기</h3>
+                    <p>
+                        다양한 패턴을 만들 때는 이런 요소들을 조합해보세요:
+                    </p>
+                    <ul>
+                        <li><strong>방향:</strong> 왼쪽에서 오른쪽, 오른쪽에서 왼쪽, 양쪽에서 중앙으로</li>
+                        <li><strong>속도:</strong> 빠르게, 느리게, 점점 빨라지게, 점점 느려지게</li>
+                        <li><strong>개수:</strong> 하나씩, 두 개씩, 여러 개씩</li>
+                        <li><strong>상태:</strong> 켜진 채로 유지, 바로 끄기, 페이드 효과</li>
+                        <li><strong>반복:</strong> 계속 반복, 몇 번만 반복, 랜덤하게</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">📝</span>
+                    정리하기
+                </h2>
+
+                <div class="concept-box">
+                    <h3>✅ 오늘 배운 내용</h3>
+                    <p>
+                        <strong>1. 배열(Array):</strong> 여러 개의 LED 핀을 하나의 변수로 관리
+                    </p>
+                    <p>
+                        <strong>2. for 반복문:</strong> 배열의 모든 요소를 순회하며 제어
+                    </p>
+                    <p>
+                        <strong>3. 다양한 패턴:</strong> 순차, 역순, 왕복, 웨이브, 반짝임 등
+                    </p>
+                    <p>
+                        <strong>4. 창의적 조합:</strong> 방향, 속도, 개수 등을 조합해서 새로운 패턴 만들기
+                    </p>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <a href="../week1_summary.html" class="nav-button prev">⬅️ Week 1 목차로</a>
+                <a href="../day_2/README.html" class="nav-button prev">⬅️ Day 2: LED 밝기 조절</a>
+                <a href="../day_4/README.html" class="nav-button next">Day 4: LED 제어 심화 ➡️</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-logo">(주)UTTEC</div>
+            <p>IoT와 AI를 배우는 즐거운 여정</p>
+            <p>ESP32-WROOM AI Kit으로 미래를 만들어가요!</p>
+        </div>
+    </div>
+</body>
+</html>

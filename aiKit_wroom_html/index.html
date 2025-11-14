@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 IoT 코딩 교육 - UTTEC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 헤더 */
+        header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 60px 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 10%, transparent 10%);
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .uttec-logo {
+            position: relative;
+            display: inline-block;
+            background: white;
+            color: #f5576c;
+            padding: 15px 35px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 2em;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            z-index: 1;
+        }
+
+        header h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        header p {
+            font-size: 1.5em;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 메인 콘텐츠 */
+        .content {
+            padding: 60px 50px;
+        }
+
+        .intro-section {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-radius: 25px;
+            padding: 50px;
+            margin-bottom: 60px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .intro-section h2 {
+            font-size: 2.8em;
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+
+        .intro-section p {
+            font-size: 1.3em;
+            color: #2c3e50;
+            line-height: 1.9;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* 주차 섹션 */
+        .weeks-section {
+            margin: 60px 0;
+        }
+
+        .weeks-section h2 {
+            font-size: 2.8em;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 50px;
+            border-bottom: 4px solid #667eea;
+            padding-bottom: 20px;
+        }
+
+        .weeks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .week-card {
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            border-top: 8px solid;
+        }
+
+        .week-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .week-card:hover {
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+        }
+
+        .week-card:hover::before {
+            opacity: 1;
+        }
+
+        .week-card.week1 {
+            border-top-color: #e74c3c;
+            background: linear-gradient(135deg, #fff 0%, #ffe8e8 100%);
+        }
+
+        .week-card.week2 {
+            border-top-color: #3498db;
+            background: linear-gradient(135deg, #fff 0%, #e8f4ff 100%);
+        }
+
+        .week-card.week3 {
+            border-top-color: #9b59b6;
+            background: linear-gradient(135deg, #fff 0%, #f4e8ff 100%);
+        }
+
+        .week-number {
+            font-size: 5em;
+            font-weight: bold;
+            opacity: 0.08;
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            line-height: 1;
+        }
+
+        .week-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .week-card h3 {
+            font-size: 2.2em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .week-card .subtitle {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .week-topics {
+            list-style: none;
+            padding: 0;
+            margin: 25px 0;
+        }
+
+        .week-topics li {
+            padding: 12px 0;
+            padding-left: 35px;
+            position: relative;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        .week-topics li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.4em;
+        }
+
+        .week-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 35px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .week-link:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 25px rgba(102,126,234,0.5);
+        }
+
+        /* 학습 특징 */
+        .features-section {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 25px;
+            padding: 50px;
+            margin: 60px 0;
+        }
+
+        .features-section h2 {
+            font-size: 2.5em;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-item {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-8px);
+        }
+
+        .feature-item .icon {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+        }
+
+        .feature-item h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .feature-item p {
+            color: #555;
+            line-height: 1.7;
+            font-size: 1.05em;
+        }
+
+        /* 통계 섹션 */
+        .stats-section {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 25px;
+            padding: 50px;
+            margin: 60px 0;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 3.5em;
+            font-weight: bold;
+            color: #f5576c;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.2em;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        /* CTA 섹션 */
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 25px;
+            padding: 60px;
+            margin: 60px 0;
+            text-align: center;
+            color: white;
+        }
+
+        .cta-section h2 {
+            font-size: 2.8em;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 1.4em;
+            margin-bottom: 35px;
+            opacity: 0.95;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 20px 50px;
+            border-radius: 35px;
+            text-decoration: none;
+            font-size: 1.4em;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .cta-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+        }
+
+        /* 푸터 */
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 50px;
+        }
+
+        footer .uttec-brand {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #f5576c;
+            margin-bottom: 20px;
+        }
+
+        footer .company-info {
+            font-size: 1.2em;
+            margin: 15px 0;
+            opacity: 0.9;
+        }
+
+        footer .copyright {
+            margin-top: 25px;
+            font-size: 1em;
+            opacity: 0.7;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .content {
+                padding: 30px 25px;
+            }
+
+            header {
+                padding: 40px 25px;
+            }
+
+            header h1 {
+                font-size: 2.2em;
+            }
+
+            .weeks-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .intro-section,
+            .features-section,
+            .stats-section,
+            .cta-section {
+                padding: 30px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <header>
+            <div class="uttec-logo">⚡ (주)UTTEC</div>
+            <h1>🚀 ESP32 IoT 코딩 교육</h1>
+            <p>초등학생을 위한 신나는 사물인터넷 여행!</p>
+        </header>
+
+        <!-- 메인 콘텐츠 -->
+        <div class="content">
+            <!-- 소개 섹션 -->
+            <div class="intro-section">
+                <h2>✨ 환영합니다!</h2>
+                <p>
+                    ESP32 마이크로컨트롤러로 배우는 IoT의 세계!<br>
+                    LED를 켜고, 웹으로 제어하고, 센서로 측정하는<br>
+                    놀라운 경험이 여러분을 기다리고 있어요.<br><br>
+                    <strong>3주 동안 진짜 개발자처럼 코딩하고 만들어봐요! 🌟</strong>
+                </p>
+            </div>
+
+            <!-- 주차별 학습 -->
+            <div class="weeks-section">
+                <h2>📚 주차별 학습 과정</h2>
+                <div class="weeks-grid">
+                    <!-- 1주차 -->
+                    <div class="week-card week1">
+                        <div class="week-number">1</div>
+                        <span class="week-icon">💡</span>
+                        <h3>1주차</h3>
+                        <div class="subtitle">ESP32 기초와 LED 제어</div>
+                        <ul class="week-topics">
+                            <li>ESP32 보드 시작하기</li>
+                            <li>LED 켜고 끄기</li>
+                            <li>PWM으로 밝기 조절</li>
+                            <li>멋진 LED 효과 만들기</li>
+                            <li>패턴 프로그래밍</li>
+                        </ul>
+                        <a href="week_1/week1_summary.html" class="week-link">1주차 시작하기 →</a>
+                    </div>
+
+                    <!-- 2주차 -->
+                    <div class="week-card week2">
+                        <div class="week-number">2</div>
+                        <span class="week-icon">📡</span>
+                        <h3>2주차</h3>
+                        <div class="subtitle">WiFi와 웹 제어</div>
+                        <ul class="week-topics">
+                            <li>WiFi AP 만들기</li>
+                            <li>웹 서버 구축하기</li>
+                            <li>웹으로 LED 제어</li>
+                            <li>여러 LED 동시 제어</li>
+                            <li>밝기 조절 + 스위치</li>
+                        </ul>
+                        <a href="week_2/week2_summary.html" class="week-link">2주차 시작하기 →</a>
+                    </div>
+
+                    <!-- 3주차 -->
+                    <div class="week-card week3">
+                        <div class="week-number">3</div>
+                        <span class="week-icon">🎯</span>
+                        <h3>3주차</h3>
+                        <div class="subtitle">센서와 종합 프로젝트</div>
+                        <ul class="week-topics">
+                            <li>부저로 소리 내기</li>
+                            <li>멜로디 연주하기</li>
+                            <li>온습도 센서 사용</li>
+                            <li>OLED 디스플레이</li>
+                            <li>최종 종합 프로젝트</li>
+                        </ul>
+                        <a href="week_3/week3_summary.html" class="week-link">3주차 시작하기 →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 학습 특징 -->
+            <div class="features-section">
+                <h2>🌟 우리 교육의 특별함</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="icon">🎮</div>
+                        <h3>재미있는 학습</h3>
+                        <p>게임하듯 즐겁게 배우는 프로그래밍! 지루할 틈이 없어요.</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🛠️</div>
+                        <h3>실습 중심</h3>
+                        <p>직접 만들고 테스트하면서 배워요. 손으로 익히는 진짜 코딩!</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🤖</div>
+                        <h3>AI 도우미</h3>
+                        <p>ChatGPT, DeepSeek, Gemini와 함께 문제를 해결해요!</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🚀</div>
+                        <h3>단계별 성장</h3>
+                        <p>쉬운 것부터 어려운 것까지, 차근차근 실력이 늘어요.</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">💡</div>
+                        <h3>창의력 개발</h3>
+                        <p>나만의 프로젝트를 디자인하고 만들어봐요!</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="icon">🏆</div>
+                        <h3>성취감</h3>
+                        <p>내가 만든 것이 실제로 작동하는 놀라운 경험!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 통계 섹션 -->
+            <div class="stats-section">
+                <h2 style="font-size: 2.5em; color: #2c3e50; margin-bottom: 20px;">📊 학습 통계</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">주간 과정</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">15</div>
+                        <div class="stat-label">일일 수업</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">40+</div>
+                        <div class="stat-label">실습 프로젝트</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">재미 보장</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA 섹션 -->
+            <div class="cta-section">
+                <h2>🎓 지금 바로 시작하세요!</h2>
+                <p>미래의 개발자가 되는 첫 걸음을 내딛어보세요.</p>
+                <a href="week_1/week1_summary.html" class="cta-button">1주차부터 시작하기 🚀</a>
+            </div>
+        </div>
+
+        <!-- 푸터 -->
+        <footer>
+            <div class="uttec-brand">⚡ (주)UTTEC</div>
+            <div class="company-info">
+                초등학생을 위한 IoT 코딩 교육 전문 기업
+            </div>
+            <div class="company-info">
+                📧 uttec@uttec.co.kr | 📞 031-627-2250
+            </div>
+            <div class="copyright">
+                © 2024 UTTEC Corporation. All rights reserved.<br>
+                함께 배우고, 만들고, 성장하는 즐거움!
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

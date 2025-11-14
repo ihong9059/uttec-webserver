@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>채팅 연결 테스트</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            padding: 40px;
+            background: #f5f7fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .status.disconnected {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        .log {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .log div {
+            margin: 5px 0;
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Socket.io 연결 테스트</h1>
+
+        <div id="status" class="status disconnected">
+            ❌ 연결 중...
+        </div>
+
+        <div>
+            <button onclick="testConnection()">🔄 연결 재시도</button>
+            <button onclick="testJoinRoom()">🚪 방 참가 테스트</button>
+            <button onclick="testSendMessage()">💬 메시지 전송 테스트</button>
+            <button onclick="clearLog()">🗑️ 로그 지우기</button>
+        </div>
+
+        <h2>📋 연결 로그</h2>
+        <div id="log" class="log"></div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        let socket;
+        let logDiv = document.getElementById('log');
+        let statusDiv = document.getElementById('status');
+
+        function addLog(message, type = 'info') {
+            const div = document.createElement('div');
+            const timestamp = new Date().toLocaleTimeString('ko-KR');
+            div.textContent = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            div.style.color = type === 'error' ? '#c62828' : type === 'success' ? '#155724' : '#333';
+            logDiv.appendChild(div);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function updateStatus(text, connected) {
+            statusDiv.textContent = text;
+            statusDiv.className = 'status ' + (connected ? 'connected' : 'disconnected');
+        }
+
+        function initSocket() {
+            addLog('Socket.io 초기화 시작...', 'info');
+
+            socket = io('http://3.35.139.224', {
+                path: '/socket.io',
+                transports: ['polling', 'websocket'],
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionAttempts: 10,
+                timeout: 20000
+            });
+
+            socket.on('connect', () => {
+                addLog(`연결 성공! Socket ID: ${socket.id}`, 'success');
+                updateStatus('✅ 연결됨', true);
+            });
+
+            socket.on('disconnect', (reason) => {
+                addLog(`연결 끊김. 이유: ${reason}`, 'error');
+                updateStatus('❌ 연결 끊김', false);
+            });
+
+            socket.on('connect_error', (error) => {
+                addLog(`연결 오류: ${error.message}`, 'error');
+                addLog(`오류 상세: ${error.toString()}`, 'error');
+                updateStatus('⚠️ 연결 오류', false);
+            });
+
+            socket.on('reconnect', (attemptNumber) => {
+                addLog(`재연결 성공 (시도 ${attemptNumber}회)`, 'success');
+            });
+
+            socket.on('reconnect_attempt', (attemptNumber) => {
+                addLog(`재연결 시도 중... (${attemptNumber}회)`, 'info');
+            });
+
+            socket.on('receive_message', (data) => {
+                addLog(`메시지 수신: [${data.user_name}] ${data.message}`, 'success');
+            });
+
+            socket.on('chat_history', (messages) => {
+                addLog(`채팅 히스토리 수신: ${messages.length}개 메시지`, 'success');
+            });
+
+            socket.on('user_joined', (data) => {
+                addLog(`사용자 입장: ${data.user_name} (${data.user_type})`, 'info');
+            });
+
+            socket.on('user_left', (data) => {
+                addLog(`사용자 퇴장: ${data.user_name} (${data.user_type})`, 'info');
+            });
+        }
+
+        function testConnection() {
+            addLog('=== 연결 재시도 ===', 'info');
+            if (socket) {
+                socket.disconnect();
+            }
+            setTimeout(initSocket, 500);
+        }
+
+        function testJoinRoom() {
+            if (!socket || !socket.connected) {
+                addLog('먼저 서버에 연결해야 합니다!', 'error');
+                return;
+            }
+            addLog('=== 방 참가 테스트 ===', 'info');
+            socket.emit('join_room', {
+                room_id: 'general',
+                user_name: '테스트사용자',
+                user_type: 'student'
+            });
+            addLog('방 참가 요청 전송 완료', 'success');
+        }
+
+        function testSendMessage() {
+            if (!socket || !socket.connected) {
+                addLog('먼저 서버에 연결해야 합니다!', 'error');
+                return;
+            }
+            addLog('=== 메시지 전송 테스트 ===', 'info');
+            socket.emit('send_message', {
+                room_id: 'general',
+                message: '테스트 메시지입니다!'
+            });
+            addLog('메시지 전송 완료', 'success');
+        }
+
+        function clearLog() {
+            logDiv.innerHTML = '';
+            addLog('로그가 지워졌습니다.', 'info');
+        }
+
+        // 페이지 로드 시 자동 연결
+        window.onload = function() {
+            addLog('페이지 로드 완료', 'info');
+            addLog('서버 URL: http://3.35.139.224', 'info');
+            addLog('Socket.io 경로: /socket.io', 'info');
+            initSocket();
+        };
+    </script>
+</body>
+</html>

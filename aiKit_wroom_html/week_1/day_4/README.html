@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 4: LED 제어 심화 - UTTEC AI Kit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #fff5f7 0%, #ffe5e5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(255, 80, 80, 0.15);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #e91e63 0%, #ff5a8a 50%, #ff8fab 100%);
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .logo {
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .day-title {
+            font-size: 48px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: rgba(255,255,255,0.95);
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        .section {
+            margin-bottom: 50px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section-title {
+            font-size: 32px;
+            color: #e91e63;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 4px solid #ff8fab;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon {
+            font-size: 40px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .objective-list {
+            background: linear-gradient(135deg, #fff5f7 0%, #ffe8ec 100%);
+            padding: 30px;
+            border-radius: 20px;
+            border-left: 6px solid #e91e63;
+            margin-bottom: 30px;
+        }
+
+        .objective-list li {
+            font-size: 20px;
+            line-height: 2;
+            color: #333;
+            margin-left: 30px;
+            padding: 10px 0;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #ffffff 0%, #fff5f7 100%);
+            padding: 35px;
+            border-radius: 20px;
+            margin: 25px 0;
+            border: 3px solid #ff8fab;
+            box-shadow: 0 10px 30px rgba(233, 30, 99, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .concept-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(233, 30, 99, 0.2);
+        }
+
+        .concept-box h3 {
+            color: #e91e63;
+            font-size: 26px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .concept-box p {
+            font-size: 19px;
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 15px;
+        }
+
+        .code-box {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            line-height: 1.6;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-box code {
+            color: #a6e22e;
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, #ffe8ec 0%, #ffd4d9 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px 0;
+            border: 3px solid #e91e63;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .activity-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(233, 30, 99, 0.25);
+        }
+
+        .activity-card h4 {
+            color: #d81b60;
+            font-size: 24px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .activity-card ol, .activity-card ul {
+            margin-left: 25px;
+        }
+
+        .activity-card li {
+            font-size: 18px;
+            line-height: 1.9;
+            color: #333;
+            margin: 12px 0;
+            padding: 8px 0;
+        }
+
+        .challenge-box {
+            background: linear-gradient(135deg, #e91e63 0%, #ff5a8a 100%);
+            color: white;
+            padding: 35px;
+            border-radius: 20px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(233, 30, 99, 0.3);
+        }
+
+        .challenge-box h3 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .challenge-box ul {
+            margin-left: 25px;
+        }
+
+        .challenge-box li {
+            font-size: 19px;
+            line-height: 2;
+            margin: 12px 0;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe6f0 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #ffc107;
+        }
+
+        .tip-box h4 {
+            color: #f57f17;
+            font-size: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tip-box p {
+            font-size: 17px;
+            line-height: 1.7;
+            color: #555;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            gap: 20px;
+        }
+
+        .nav-button {
+            flex: 1;
+            padding: 20px 30px;
+            border-radius: 15px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-button.prev {
+            background: linear-gradient(135deg, #ff8fab 0%, #e91e63 100%);
+            color: white;
+        }
+
+        .nav-button.next {
+            background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
+            color: white;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            text-align: center;
+            padding: 40px;
+            margin-top: 50px;
+        }
+
+        .footer-logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .footer p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 30px 20px;
+            }
+
+            .day-title {
+                font-size: 36px;
+            }
+
+            .section-title {
+                font-size: 26px;
+            }
+
+            .navigation {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">(주)UTTEC - AI Kit 교육과정</div>
+            <div class="day-title">Day 4</div>
+            <div class="subtitle">LED 제어 심화</div>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🎯</span>
+                    학습 목표
+                </h2>
+                <div class="objective-list">
+                    <ul>
+                        <li>millis() 함수를 이용한 비동기 LED 제어 배우기</li>
+                        <li>여러 LED를 독립적으로 제어하는 방법 익히기</li>
+                        <li>복잡한 타이밍과 패턴을 조합하는 기법 학습</li>
+                        <li>함수를 만들어서 코드를 깔끔하게 정리하기</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">💡</span>
+                    핵심 개념
+                </h2>
+
+                <div class="concept-box">
+                    <h3>⏱️ millis() 함수란?</h3>
+                    <p>
+                        millis()는 ESP32가 시작된 후부터 지나간 시간을 밀리초(ms) 단위로 알려주는 함수예요.
+                        delay() 함수와 달리 프로그램을 멈추지 않고 시간을 체크할 수 있어요!
+                    </p>
+                    <p>
+                        <strong>delay()의 문제점:</strong> delay(1000)을 하면 1초 동안 프로그램이 완전히 멈춰요.
+                        그 동안에는 다른 작업을 할 수 없어요.
+                    </p>
+                    <p>
+                        <strong>millis()의 장점:</strong> 시간을 체크하면서도 다른 작업을 계속할 수 있어요!
+                    </p>
+                    <div class="code-box">
+<code>unsigned long currentTime = millis();  // 현재 시간 가져오기
+Serial.println(currentTime);  // 예: 5000 (5초가 지났다는 뜻)</code>
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <h3>🎭 비동기 LED 제어</h3>
+                    <p>
+                        millis()를 사용하면 여러 LED를 독립적으로 제어할 수 있어요.
+                        하나의 LED가 깜빡이는 동안 다른 LED는 다른 속도로 움직일 수 있죠!
+                    </p>
+                    <div class="code-box">
+<code>unsigned long previousTime = 0;  // 이전 시간 저장
+const long interval = 1000;       // 간격 (1초)
+
+void loop() {
+  unsigned long currentTime = millis();
+
+  // 1초가 지났는지 확인
+  if(currentTime - previousTime >= interval) {
+    previousTime = currentTime;  // 시간 업데이트
+
+    // LED 상태 토글
+    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+  }
+
+  // 여기서 다른 작업을 할 수 있어요!
+}</code>
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <h3>🔧 함수 만들기</h3>
+                    <p>
+                        복잡한 LED 패턴을 함수로 만들면 코드가 깔끔해지고 재사용하기 쉬워요!
+                    </p>
+                    <div class="code-box">
+<code>// LED를 켜고 끄는 함수
+void blinkLED(int pin, int times, int delayTime) {
+  for(int i = 0; i < times; i++) {
+    digitalWrite(pin, HIGH);
+    delay(delayTime);
+    digitalWrite(pin, LOW);
+    delay(delayTime);
+  }
+}
+
+void loop() {
+  blinkLED(2, 3, 200);   // 2번 핀 LED를 3번, 200ms 간격으로 깜빡임
+  blinkLED(4, 5, 100);   // 4번 핀 LED를 5번, 100ms 간격으로 깜빡임
+}</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🔨</span>
+                    실습 활동
+                </h2>
+
+                <div class="activity-card">
+                    <h4>⏰ 활동 1: millis()로 LED 깜빡이기</h4>
+                    <p>delay() 없이 LED를 깜빡이는 프로그램을 만들어봐요!</p>
+                    <div class="code-box">
+<code>const int LED_PIN = 2;
+unsigned long previousTime = 0;
+const long interval = 500;  // 500ms
+bool ledState = false;
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+}
+
+void loop() {
+  unsigned long currentTime = millis();
+
+  if(currentTime - previousTime >= interval) {
+    previousTime = currentTime;
+    ledState = !ledState;
+    digitalWrite(LED_PIN, ledState);
+  }
+}</code>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h4>🎪 활동 2: 여러 LED 독립 제어</h4>
+                    <p>3개의 LED가 각각 다른 속도로 깜빡이도록 만들어봐요!</p>
+                    <div class="code-box">
+<code>const int LED1 = 2;
+const int LED2 = 4;
+const int LED3 = 5;
+
+unsigned long prevTime1 = 0;
+unsigned long prevTime2 = 0;
+unsigned long prevTime3 = 0;
+
+const long interval1 = 500;   // LED1: 500ms
+const long interval2 = 300;   // LED2: 300ms
+const long interval3 = 700;   // LED3: 700ms
+
+bool state1 = false;
+bool state2 = false;
+bool state3 = false;
+
+void setup() {
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(LED3, OUTPUT);
+}
+
+void loop() {
+  unsigned long currentTime = millis();
+
+  // LED1 제어
+  if(currentTime - prevTime1 >= interval1) {
+    prevTime1 = currentTime;
+    state1 = !state1;
+    digitalWrite(LED1, state1);
+  }
+
+  // LED2 제어
+  if(currentTime - prevTime2 >= interval2) {
+    prevTime2 = currentTime;
+    state2 = !state2;
+    digitalWrite(LED2, state2);
+  }
+
+  // LED3 제어
+  if(currentTime - prevTime3 >= interval3) {
+    prevTime3 = currentTime;
+    state3 = !state3;
+    digitalWrite(LED3, state3);
+  }
+}</code>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h4>🌈 활동 3: 페이드 함수 만들기</h4>
+                    <p>LED를 페이드 인/아웃 시키는 함수를 만들어봐요!</p>
+                    <div class="code-box">
+<code>void fadeIn(int pin, int duration) {
+  int steps = 255;
+  int delayTime = duration / steps;
+
+  for(int i = 0; i <= 255; i++) {
+    analogWrite(pin, i);
+    delay(delayTime);
+  }
+}
+
+void fadeOut(int pin, int duration) {
+  int steps = 255;
+  int delayTime = duration / steps;
+
+  for(int i = 255; i >= 0; i--) {
+    analogWrite(pin, i);
+    delay(delayTime);
+  }
+}
+
+void loop() {
+  fadeIn(2, 1000);    // 1초 동안 페이드 인
+  delay(500);
+  fadeOut(2, 1000);   // 1초 동안 페이드 아웃
+  delay(500);
+}</code>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h4>🎨 활동 4: 복합 패턴 함수</h4>
+                    <p>여러 패턴을 조합한 함수를 만들어봐요!</p>
+                    <div class="code-box">
+<code>void heartbeat(int pin) {
+  // 빠른 두 번의 깜빡임
+  digitalWrite(pin, HIGH);
+  delay(100);
+  digitalWrite(pin, LOW);
+  delay(100);
+  digitalWrite(pin, HIGH);
+  delay(100);
+  digitalWrite(pin, LOW);
+  delay(500);
+}
+
+void policeLight(int pin1, int pin2) {
+  for(int i = 0; i < 3; i++) {
+    digitalWrite(pin1, HIGH);
+    delay(100);
+    digitalWrite(pin1, LOW);
+    delay(100);
+  }
+  for(int i = 0; i < 3; i++) {
+    digitalWrite(pin2, HIGH);
+    delay(100);
+    digitalWrite(pin2, LOW);
+    delay(100);
+  }
+}
+
+void loop() {
+  heartbeat(2);
+  delay(300);
+  policeLight(4, 5);
+  delay(500);
+}</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">💡</span>
+                    프로 팁
+                </h2>
+
+                <div class="tip-box">
+                    <h4>💡 Tip 1: 코드 구조화</h4>
+                    <p>
+                        복잡한 프로그램을 만들 때는 함수로 나누면 관리하기 쉬워요.
+                        각 함수는 하나의 명확한 기능만 담당하도록 만들어보세요!
+                    </p>
+                </div>
+
+                <div class="tip-box">
+                    <h4>💡 Tip 2: 상수 사용하기</h4>
+                    <p>
+                        핀 번호나 시간 값을 const로 선언하면 나중에 수정하기 쉽고,
+                        실수로 값이 바뀌는 것을 방지할 수 있어요!
+                    </p>
+                </div>
+
+                <div class="tip-box">
+                    <h4>💡 Tip 3: 주석 달기</h4>
+                    <p>
+                        코드 위에 간단한 설명을 달아두면 나중에 다시 봤을 때
+                        무엇을 하는 코드인지 쉽게 알 수 있어요!
+                    </p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🚀</span>
+                    도전 과제
+                </h2>
+
+                <div class="challenge-box">
+                    <h3>🏆 스스로 해보기</h3>
+                    <ul>
+                        <li>🌟 millis()를 사용해서 5개의 LED를 각각 다른 속도로 제어하기</li>
+                        <li>🌟🌟 LED 밝기가 부드럽게 변하는 함수 만들기 (sine 파형 활용)</li>
+                        <li>🌟🌟 신호등 패턴을 함수로 만들기 (빨강 → 노랑 → 초록)</li>
+                        <li>🌟🌟🌟 여러 패턴을 순서대로 실행하는 LED 쇼 프로그램 만들기</li>
+                        <li>🌟🌟🌟 버튼을 누르면 패턴이 바뀌는 프로그램 만들기</li>
+                        <li>🌟🌟🌟🌟 음악 비트에 맞춰 깜빡이는 LED 만들기</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">📝</span>
+                    정리하기
+                </h2>
+
+                <div class="concept-box">
+                    <h3>✅ 오늘 배운 내용</h3>
+                    <p>
+                        <strong>1. millis() 함수:</strong> 프로그램을 멈추지 않고 시간 체크
+                    </p>
+                    <p>
+                        <strong>2. 비동기 제어:</strong> 여러 LED를 독립적으로 제어
+                    </p>
+                    <p>
+                        <strong>3. 함수 만들기:</strong> 코드를 재사용 가능한 단위로 분리
+                    </p>
+                    <p>
+                        <strong>4. 복합 패턴:</strong> 여러 기술을 조합해서 복잡한 효과 만들기
+                    </p>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <a href="../week1_summary.html" class="nav-button prev">⬅️ Week 1 목차로</a>
+                <a href="../day_3/README.html" class="nav-button prev">⬅️ Day 3: LED 패턴 만들기</a>
+                <a href="../day_5/README.html" class="nav-button next">Day 5: LED 종합 프로젝트 ➡️</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-logo">(주)UTTEC</div>
+            <p>IoT와 AI를 배우는 즐거운 여정</p>
+            <p>ESP32-WROOM AI Kit으로 미래를 만들어가요!</p>
+        </div>
+    </div>
+</body>
+</html>

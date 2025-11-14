@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 11: 부저로 소리 내기 - UTTEC AI Kit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(156, 39, 176, 0.15);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #9c27b0 0%, #ab47bc 50%, #ba68c8 100%);
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .logo {
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .day-title {
+            font-size: 48px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: rgba(255,255,255,0.95);
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        .section {
+            margin-bottom: 50px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section-title {
+            font-size: 32px;
+            color: #9c27b0;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 4px solid #ba68c8;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon {
+            font-size: 40px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .objective-list {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            padding: 30px;
+            border-radius: 20px;
+            border-left: 6px solid #9c27b0;
+            margin-bottom: 30px;
+        }
+
+        .objective-list li {
+            font-size: 20px;
+            line-height: 2;
+            color: #333;
+            margin-left: 30px;
+            padding: 10px 0;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #ffffff 0%, #f3e5f5 100%);
+            padding: 35px;
+            border-radius: 20px;
+            margin: 25px 0;
+            border: 3px solid #ba68c8;
+            box-shadow: 0 10px 30px rgba(156, 39, 176, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .concept-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(156, 39, 176, 0.2);
+        }
+
+        .concept-box h3 {
+            color: #9c27b0;
+            font-size: 26px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .concept-box p {
+            font-size: 19px;
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 15px;
+        }
+
+        .code-box {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            line-height: 1.6;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-box code {
+            color: #a6e22e;
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px 0;
+            border: 3px solid #9c27b0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .activity-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(156, 39, 176, 0.25);
+        }
+
+        .activity-card h4 {
+            color: #7b1fa2;
+            font-size: 24px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .activity-card ol, .activity-card ul {
+            margin-left: 25px;
+        }
+
+        .activity-card li {
+            font-size: 18px;
+            line-height: 1.9;
+            color: #333;
+            margin: 12px 0;
+            padding: 8px 0;
+        }
+
+        .challenge-box {
+            background: linear-gradient(135deg, #9c27b0 0%, #ab47bc 100%);
+            color: white;
+            padding: 35px;
+            border-radius: 20px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(156, 39, 176, 0.3);
+        }
+
+        .challenge-box h3 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .challenge-box ul {
+            margin-left: 25px;
+        }
+
+        .challenge-box li {
+            font-size: 19px;
+            line-height: 2;
+            margin: 12px 0;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            gap: 20px;
+        }
+
+        .nav-button {
+            flex: 1;
+            padding: 20px 30px;
+            border-radius: 15px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-button.prev {
+            background: linear-gradient(135deg, #ba68c8 0%, #9c27b0 100%);
+            color: white;
+        }
+
+        .nav-button.next {
+            background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+            color: white;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            text-align: center;
+            padding: 40px;
+            margin-top: 50px;
+        }
+
+        .footer-logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .footer p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 30px 20px;
+            }
+
+            .day-title {
+                font-size: 36px;
+            }
+
+            .section-title {
+                font-size: 26px;
+            }
+
+            .navigation {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">(주)UTTEC - AI Kit 교육과정</div>
+            <div class="day-title">Day 11</div>
+            <div class="subtitle">부저로 소리 내기</div>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🎯</span>
+                    학습 목표
+                </h2>
+                <div class="objective-list">
+                    <ul>
+                        <li>부저(Beeper/Buzzer)가 무엇인지 이해하기</li>
+                        <li>tone() 함수로 소리 만들기</li>
+                        <li>주파수와 음높이의 관계 배우기</li>
+                        <li>다양한 소리 효과 만들기</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">💡</span>
+                    핵심 개념
+                </h2>
+
+                <div class="concept-box">
+                    <h3>🔊 부저(Buzzer)란?</h3>
+                    <p>
+                        부저는 전기 신호를 소리로 바꿔주는 장치예요.
+                        알람, 벨소리, 경고음 등 다양한 소리를 만들 수 있답니다!
+                    </p>
+                    <p>
+                        부저에는 두 가지 종류가 있어요:
+                    </p>
+                    <ul>
+                        <li><strong>능동 부저:</strong> 전원만 연결하면 정해진 소리가 나요</li>
+                        <li><strong>수동 부저:</strong> 주파수를 조절해서 다양한 음을 낼 수 있어요</li>
+                    </ul>
+                    <p>우리는 수동 부저를 사용해서 여러 음을 만들어볼 거예요!</p>
+                </div>
+
+                <div class="concept-box">
+                    <h3>🎵 주파수와 음높이</h3>
+                    <p>
+                        소리는 공기가 진동하는 거예요.
+                        1초에 몇 번 진동하는지를 '주파수'라고 하고, 단위는 Hz(헤르츠)예요.
+                    </p>
+                    <ul>
+                        <li><strong>낮은 주파수:</strong> 낮은 음 (예: 100Hz)</li>
+                        <li><strong>높은 주파수:</strong> 높은 음 (예: 1000Hz)</li>
+                    </ul>
+                    <p>
+                        사람이 들을 수 있는 소리는 약 20Hz~20,000Hz 범위예요!
+                    </p>
+                </div>
+
+                <div class="concept-box">
+                    <h3>🎼 tone() 함수</h3>
+                    <p>
+                        ESP32에서 tone() 함수를 사용하면 부저로 소리를 낼 수 있어요:
+                    </p>
+                    <div class="code-box">
+<code>tone(핀번호, 주파수, 지속시간);
+
+// 예시:
+tone(25, 262, 500);  // 25번 핀에서 도(262Hz)를 0.5초 동안</code>
+                    </div>
+                    <p><strong>매개변수:</strong></p>
+                    <ul>
+                        <li>핀번호: 부저가 연결된 핀</li>
+                        <li>주파수: 소리의 높이 (Hz)</li>
+                        <li>지속시간: 소리가 나는 시간 (밀리초, 생략 가능)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🔨</span>
+                    실습 활동
+                </h2>
+
+                <div class="activity-card">
+                    <h4>🔔 활동 1: 첫 번째 소리 만들기</h4>
+                    <p>부저로 간단한 삐 소리를 만들어봐요!</p>
+                    <div class="code-box">
+<code>const int BUZZER_PIN = 25;
+
+void setup() {
+  pinMode(BUZZER_PIN, OUTPUT);
+}
+
+void loop() {
+  tone(BUZZER_PIN, 1000);  // 1000Hz 소리
+  delay(500);
+  noTone(BUZZER_PIN);      // 소리 끄기
+  delay(500);
+}</code>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h4>🎶 활동 2: 다양한 높이의 소리</h4>
+                    <p>주파수를 바꿔가며 낮은 음부터 높은 음까지 만들어봐요!</p>
+                    <div class="code-box">
+<code>const int BUZZER_PIN = 25;
+
+void setup() {
+  pinMode(BUZZER_PIN, OUTPUT);
+}
+
+void loop() {
+  // 낮은 음
+  tone(BUZZER_PIN, 262);  // 도
+  delay(500);
+
+  // 중간 음
+  tone(BUZZER_PIN, 523);  // 높은 도
+  delay(500);
+
+  // 높은 음
+  tone(BUZZER_PIN, 1047); // 더 높은 도
+  delay(500);
+
+  noTone(BUZZER_PIN);
+  delay(1000);
+}</code>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h4>🚨 활동 3: 경고음 만들기</h4>
+                    <p>사이렌처럼 소리가 올라갔다 내려갔다 하는 효과를 만들어봐요!</p>
+                    <div class="code-box">
+<code>const int BUZZER_PIN = 25;
+
+void setup() {
+  pinMode(BUZZER_PIN, OUTPUT);
+}
+
+void loop() {
+  // 주파수를 점점 높이기
+  for(int freq = 200; freq <= 2000; freq += 50) {
+    tone(BUZZER_PIN, freq);
+    delay(20);
+  }
+
+  // 주파수를 점점 낮추기
+  for(int freq = 2000; freq >= 200; freq -= 50) {
+    tone(BUZZER_PIN, freq);
+    delay(20);
+  }
+
+  noTone(BUZZER_PIN);
+  delay(500);
+}</code>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h4>📞 활동 4: 전화벨 소리</h4>
+                    <p>전화 벨소리처럼 두 음을 반복하는 효과를 만들어봐요!</p>
+                    <div class="code-box">
+<code>const int BUZZER_PIN = 25;
+
+void playRing() {
+  for(int i = 0; i < 3; i++) {
+    tone(BUZZER_PIN, 800);
+    delay(100);
+    tone(BUZZER_PIN, 1000);
+    delay(100);
+  }
+  noTone(BUZZER_PIN);
+}
+
+void setup() {
+  pinMode(BUZZER_PIN, OUTPUT);
+}
+
+void loop() {
+  playRing();
+  delay(2000);
+}</code>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h4>🎮 활동 5: 게임 효과음</h4>
+                    <p>게임에서 들을 수 있는 효과음들을 만들어봐요!</p>
+                    <div class="code-box">
+<code>const int BUZZER_PIN = 25;
+
+// 레벨업 소리
+void levelUp() {
+  for(int i = 0; i < 3; i++) {
+    tone(BUZZER_PIN, 523 + i*100);
+    delay(100);
+  }
+  noTone(BUZZER_PIN);
+}
+
+// 코인 획득 소리
+void coinGet() {
+  tone(BUZZER_PIN, 1000);
+  delay(50);
+  tone(BUZZER_PIN, 1500);
+  delay(50);
+  noTone(BUZZER_PIN);
+}
+
+// 실패 소리
+void gameOver() {
+  tone(BUZZER_PIN, 400);
+  delay(200);
+  tone(BUZZER_PIN, 300);
+  delay(200);
+  tone(BUZZER_PIN, 200);
+  delay(400);
+  noTone(BUZZER_PIN);
+}
+
+void setup() {
+  pinMode(BUZZER_PIN, OUTPUT);
+  Serial.begin(115200);
+}
+
+void loop() {
+  Serial.println("레벨업!");
+  levelUp();
+  delay(1000);
+
+  Serial.println("코인 획득!");
+  coinGet();
+  delay(1000);
+
+  Serial.println("게임 오버!");
+  gameOver();
+  delay(2000);
+}</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🚀</span>
+                    도전 과제
+                </h2>
+
+                <div class="challenge-box">
+                    <h3>🏆 스스로 해보기</h3>
+                    <ul>
+                        <li>🌟 버튼을 누르면 삐 소리가 나는 프로그램</li>
+                        <li>🌟🌟 경찰차 사이렌 소리 만들기 (빠르게 교대)</li>
+                        <li>🌟🌟 알람 시계 소리 (점점 크게, 빠르게)</li>
+                        <li>🌟🌟🌟 문 열림 경고음 (짧은 삐 3번)</li>
+                        <li>🌟🌟🌟 로봇 말하는 소리 효과 (무작위 주파수)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">📝</span>
+                    정리하기
+                </h2>
+
+                <div class="concept-box">
+                    <h3>✅ 오늘 배운 내용</h3>
+                    <p>
+                        <strong>1. 부저:</strong> 전기 신호를 소리로 변환하는 장치
+                    </p>
+                    <p>
+                        <strong>2. 주파수:</strong> 1초에 진동하는 횟수, Hz 단위
+                    </p>
+                    <p>
+                        <strong>3. tone():</strong> 특정 주파수의 소리 만들기
+                    </p>
+                    <p>
+                        <strong>4. noTone():</strong> 소리 끄기
+                    </p>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <a href="../week3_summary.html" class="nav-button prev">⬅️ Week 3 목차로</a>
+                <a href="../day_12/README.html" class="nav-button next">Day 12: 멜로디 연주하기 ➡️</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-logo">(주)UTTEC</div>
+            <p>IoT와 AI를 배우는 즐거운 여정</p>
+            <p>ESP32-WROOM AI Kit으로 미래를 만들어가요!</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>채팅 관리 - UTTEC AI 교육</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { font-size: 1.8em; }
+        .btn-back {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-back:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .container {
+            flex: 1;
+            display: flex;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            gap: 20px;
+        }
+        .chat-main {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .chat-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .connection-status {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        .connection-status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        .connection-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            background: #f5f7fa;
+        }
+        .message {
+            margin: 15px 0;
+            padding: 15px 20px;
+            border-radius: 15px;
+            max-width: 70%;
+            word-wrap: break-word;
+            animation: messageSlide 0.3s ease-out;
+        }
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .message-student {
+            background: white;
+            border: 2px solid #e0e0e0;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+        .message-admin {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-left: auto;
+            text-align: right;
+            border-bottom-right-radius: 5px;
+        }
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+        }
+        .message-name {
+            font-weight: bold;
+        }
+        .message-time {
+            opacity: 0.7;
+            font-size: 0.9em;
+        }
+        .message-content {
+            line-height: 1.6;
+        }
+        .system-message {
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+            margin: 20px 0;
+            font-style: italic;
+        }
+        .chat-input-area {
+            padding: 20px;
+            background: white;
+            border-top: 2px solid #e0e0e0;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn-send {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+        .btn-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .users-panel {
+            width: 300px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .users-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .user-list {
+            list-style: none;
+        }
+        .user-item {
+            padding: 12px;
+            margin: 8px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-item.admin {
+            background: #e3f2fd;
+        }
+        .user-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4caf50;
+        }
+        .user-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .user-type {
+            margin-left: auto;
+            font-size: 0.8em;
+            color: #666;
+            background: #e0e0e0;
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+        .no-messages {
+            text-align: center;
+            color: #999;
+            padding: 60px 20px;
+            font-size: 1.1em;
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .users-panel {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💬 채팅 관리</h1>
+        <a href="/admin/dashboard.html" class="btn-back">← 대시보드</a>
+    </div>
+
+    <div class="container">
+        <div class="chat-main">
+            <div class="chat-header">
+                <div class="chat-title">실시간 채팅 모니터링</div>
+                <div id="connectionStatus" class="connection-status disconnected">연결 중...</div>
+            </div>
+
+            <div id="chatMessages" class="chat-messages">
+                <div class="no-messages">채팅 내역이 없습니다.</div>
+            </div>
+
+            <div class="chat-input-area">
+                <div class="input-group">
+                    <input type="text" id="messageInput" placeholder="학생들에게 메시지를 보내세요..." maxlength="500" />
+                    <button id="sendButton" class="btn-send" disabled>전송</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="users-panel">
+            <div class="users-title">접속 중인 사용자</div>
+            <ul id="userList" class="user-list">
+                <li style="text-align: center; color: #999; padding: 20px;">
+                    사용자 정보를 불러오는 중...
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        const socket = io('http://3.35.139.224', {
+            path: '/socket.io',
+            transports: ['polling', 'websocket'],
+            reconnection: true,
+            reconnectionDelay: 1000,
+            reconnectionAttempts: 10,
+            timeout: 20000
+        });
+
+        const adminName = 'Admin';
+        const roomId = 'general';
+        let isConnected = false;
+
+        const messagesDiv = document.getElementById('chatMessages');
+        const statusDiv = document.getElementById('connectionStatus');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const userList = document.getElementById('userList');
+
+        // 연결 상태 관리
+        socket.on('connect', () => {
+            console.log('Connected:', socket.id);
+            isConnected = true;
+            statusDiv.textContent = '✅ 연결됨';
+            statusDiv.className = 'connection-status connected';
+            sendButton.disabled = false;
+
+            // 관리자로 방 참가
+            socket.emit('join_room', {
+                room_id: roomId,
+                user_name: adminName,
+                user_type: 'admin'
+            });
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected');
+            isConnected = false;
+            statusDiv.textContent = '❌ 연결 끊김';
+            statusDiv.className = 'connection-status disconnected';
+            sendButton.disabled = true;
+        });
+
+        socket.on('connect_error', (error) => {
+            console.error('Connection error:', error);
+            statusDiv.textContent = '⚠️ 연결 오류';
+            statusDiv.className = 'connection-status disconnected';
+        });
+
+        // 메시지 수신
+        socket.on('receive_message', (data) => {
+            console.log('Received message:', data);
+            addMessage(data.user_name, data.message, data.user_type, data.timestamp);
+        });
+
+        // 채팅 히스토리 수신
+        socket.on('chat_history', (messages) => {
+            console.log('Received chat history:', messages.length, 'messages');
+            if (messages.length > 0) {
+                messagesDiv.innerHTML = '';
+                messages.forEach(msg => {
+                    addMessage(msg.user_name, msg.message, msg.user_type, msg.timestamp);
+                });
+            }
+        });
+
+        // 사용자 입장
+        socket.on('user_joined', (data) => {
+            console.log('User joined:', data);
+            addSystemMessage(`${data.user_name}님이 입장했습니다.`);
+            updateUserList();
+        });
+
+        // 사용자 퇴장
+        socket.on('user_left', (data) => {
+            console.log('User left:', data);
+            addSystemMessage(`${data.user_name}님이 퇴장했습니다.`);
+            updateUserList();
+        });
+
+        // 메시지 전송
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message && isConnected) {
+                console.log('Sending message:', message);
+                socket.emit('send_message', {
+                    room_id: roomId,
+                    message: message
+                });
+                messageInput.value = '';
+                messageInput.focus();
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // 메시지 표시
+        function addMessage(name, message, type, timestamp) {
+            // 첫 메시지면 "no-messages" 제거
+            const noMsgDiv = messagesDiv.querySelector('.no-messages');
+            if (noMsgDiv) {
+                noMsgDiv.remove();
+            }
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message message-' + type;
+
+            const time = timestamp ? formatTime(new Date(timestamp)) : formatTime(new Date());
+
+            msgDiv.innerHTML = `
+                <div class="message-header">
+                    <span class="message-name">${escapeHtml(name)}</span>
+                    <span class="message-time">${time}</span>
+                </div>
+                <div class="message-content">${escapeHtml(message)}</div>
+            `;
+
+            messagesDiv.appendChild(msgDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function addSystemMessage(message) {
+            const noMsgDiv = messagesDiv.querySelector('.no-messages');
+            if (noMsgDiv) {
+                noMsgDiv.remove();
+            }
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'system-message';
+            msgDiv.textContent = message;
+            messagesDiv.appendChild(msgDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function formatTime(date) {
+            return date.toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function updateUserList() {
+            // 실제 구현에서는 서버에서 현재 접속 중인 사용자 목록을 받아와야 함
+            // 여기서는 간단히 표시만 함
+            userList.innerHTML = `
+                <li class="user-item admin">
+                    <div class="user-status"></div>
+                    <span class="user-name">관리자 (나)</span>
+                    <span class="user-type">선생님</span>
+                </li>
+            `;
+        }
+
+        // 초기화
+        updateUserList();
+
+        // 인증 확인
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/admin/verify');
+                const result = await response.json();
+                if (!result.authenticated) {
+                    window.location.href = '/admin/login.html';
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.href = '/admin/login.html';
+            }
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>

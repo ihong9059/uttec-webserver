@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 6: WiFi 기초 배우기 - UTTEC AI Kit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(33, 150, 243, 0.15);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2196f3 0%, #42a5f5 50%, #64b5f6 100%);
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .logo {
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .day-title {
+            font-size: 48px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: rgba(255,255,255,0.95);
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        .section {
+            margin-bottom: 50px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section-title {
+            font-size: 32px;
+            color: #2196f3;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 4px solid #64b5f6;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon {
+            font-size: 40px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .objective-list {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 30px;
+            border-radius: 20px;
+            border-left: 6px solid #2196f3;
+            margin-bottom: 30px;
+        }
+
+        .objective-list li {
+            font-size: 20px;
+            line-height: 2;
+            color: #333;
+            margin-left: 30px;
+            padding: 10px 0;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
+            padding: 35px;
+            border-radius: 20px;
+            margin: 25px 0;
+            border: 3px solid #64b5f6;
+            box-shadow: 0 10px 30px rgba(33, 150, 243, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .concept-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(33, 150, 243, 0.2);
+        }
+
+        .concept-box h3 {
+            color: #2196f3;
+            font-size: 26px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .concept-box p {
+            font-size: 19px;
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 15px;
+        }
+
+        .analogy-box {
+            background: linear-gradient(135deg, #fff9e6 0%, #e3f2fd 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 25px 0;
+            border-left: 6px solid #ffc107;
+            box-shadow: 0 8px 25px rgba(255, 193, 7, 0.15);
+        }
+
+        .analogy-box h4 {
+            color: #f57f17;
+            font-size: 22px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .analogy-box p {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .code-box {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            line-height: 1.6;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-box code {
+            color: #a6e22e;
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px 0;
+            border: 3px solid #2196f3;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .activity-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(33, 150, 243, 0.25);
+        }
+
+        .activity-card h4 {
+            color: #1976d2;
+            font-size: 24px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .activity-card ol, .activity-card ul {
+            margin-left: 25px;
+        }
+
+        .activity-card li {
+            font-size: 18px;
+            line-height: 1.9;
+            color: #333;
+            margin: 12px 0;
+            padding: 8px 0;
+        }
+
+        .challenge-box {
+            background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
+            color: white;
+            padding: 35px;
+            border-radius: 20px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(33, 150, 243, 0.3);
+        }
+
+        .challenge-box h3 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .challenge-box ul {
+            margin-left: 25px;
+        }
+
+        .challenge-box li {
+            font-size: 19px;
+            line-height: 2;
+            margin: 12px 0;
+        }
+
+        .wifi-diagram {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 25px 0;
+            text-align: center;
+            border: 2px dashed #2196f3;
+        }
+
+        .wifi-diagram p {
+            font-size: 18px;
+            color: #555;
+            margin: 10px 0;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            gap: 20px;
+        }
+
+        .nav-button {
+            flex: 1;
+            padding: 20px 30px;
+            border-radius: 15px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-button.prev {
+            background: linear-gradient(135deg, #64b5f6 0%, #2196f3 100%);
+            color: white;
+        }
+
+        .nav-button.next {
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+            color: white;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            text-align: center;
+            padding: 40px;
+            margin-top: 50px;
+        }
+
+        .footer-logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .footer p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 30px 20px;
+            }
+
+            .day-title {
+                font-size: 36px;
+            }
+
+            .section-title {
+                font-size: 26px;
+            }
+
+            .navigation {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">(주)UTTEC - AI Kit 교육과정</div>
+            <div class="day-title">Day 6</div>
+            <div class="subtitle">WiFi 기초 배우기</div>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🎯</span>
+                    학습 목표
+                </h2>
+                <div class="objective-list">
+                    <ul>
+                        <li>WiFi가 무엇인지, 어떻게 작동하는지 이해하기</li>
+                        <li>ESP32의 WiFi 기능 알아보기</li>
+                        <li>AP 모드와 Station 모드의 차이점 배우기</li>
+                        <li>ESP32를 AP(공유기)로 만드는 방법 익히기</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">💡</span>
+                    핵심 개념
+                </h2>
+
+                <div class="concept-box">
+                    <h3>📡 WiFi란 무엇일까?</h3>
+                    <p>
+                        WiFi는 무선으로 인터넷에 연결하는 기술이에요.
+                        컴퓨터, 스마트폰, 태블릿 등이 선 없이 인터넷을 사용할 수 있게 해주죠!
+                    </p>
+                    <p>
+                        WiFi는 전파를 이용해서 정보를 주고받아요.
+                        눈에는 보이지 않지만 공기 중에 전파가 날아다니며 데이터를 전송하는 거예요.
+                    </p>
+                </div>
+
+                <div class="analogy-box">
+                    <h4>🌟 비유로 이해하기</h4>
+                    <p>
+                        WiFi를 라디오 방송국에 비유해볼까요?
+                        방송국(공유기)에서 전파를 보내면, 라디오(스마트폰, 컴퓨터)가 그 전파를 받아서
+                        소리(데이터)를 들려주는 것과 비슷해요.
+                        다만 WiFi는 양방향으로 정보를 주고받을 수 있다는 점이 다르죠!
+                    </p>
+                </div>
+
+                <div class="concept-box">
+                    <h3>🔌 ESP32의 WiFi 기능</h3>
+                    <p>
+                        ESP32는 WiFi 기능이 내장되어 있어요!
+                        다른 부품을 추가하지 않아도 WiFi를 사용할 수 있답니다.
+                    </p>
+                    <p>
+                        ESP32의 WiFi는 두 가지 모드로 동작할 수 있어요:
+                    </p>
+                    <ul>
+                        <li><strong>AP 모드 (Access Point):</strong> ESP32가 공유기가 되어 다른 기기들이 연결할 수 있게 해요</li>
+                        <li><strong>Station 모드:</strong> ESP32가 기존 WiFi에 연결해요 (스마트폰처럼)</li>
+                    </ul>
+                </div>
+
+                <div class="concept-box">
+                    <h3>🏠 AP 모드란?</h3>
+                    <p>
+                        AP (Access Point) 모드는 ESP32를 공유기처럼 만드는 거예요!
+                    </p>
+                    <div class="wifi-diagram">
+                        <p>📱 스마트폰 ←→ 📶 ESP32 (AP) ←→ 💡 LED</p>
+                        <p style="margin-top: 20px; color: #2196f3; font-weight: bold;">
+                            ESP32가 WiFi 신호를 만들어서 스마트폰이 직접 연결해요!
+                        </p>
+                    </div>
+                    <p>
+                        <strong>AP 모드의 장점:</strong>
+                    </p>
+                    <ul>
+                        <li>인터넷 공유기가 없어도 사용 가능</li>
+                        <li>야외에서도 작동</li>
+                        <li>ESP32와 스마트폰만 있으면 OK</li>
+                    </ul>
+                </div>
+
+                <div class="concept-box">
+                    <h3>🌐 Station 모드란?</h3>
+                    <p>
+                        Station 모드는 ESP32가 기존 WiFi 공유기에 연결하는 거예요.
+                    </p>
+                    <div class="wifi-diagram">
+                        <p>📱 스마트폰 ←→ 🌐 공유기 ←→ 📶 ESP32 ←→ 💡 LED</p>
+                        <p style="margin-top: 20px; color: #2196f3; font-weight: bold;">
+                            모든 기기가 같은 WiFi에 연결되어 통신해요!
+                        </p>
+                    </div>
+                    <p>
+                        <strong>Station 모드의 장점:</strong>
+                    </p>
+                    <ul>
+                        <li>인터넷 사용 가능</li>
+                        <li>여러 ESP32를 한 네트워크에 연결</li>
+                        <li>집 어디서나 제어 가능</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🔨</span>
+                    실습 활동
+                </h2>
+
+                <div class="activity-card">
+                    <h4>📶 활동 1: ESP32를 AP로 만들기</h4>
+                    <p>ESP32를 공유기처럼 만들어서 스마트폰으로 연결해봐요!</p>
+                    <div class="code-box">
+<code>#include &lt;WiFi.h&gt;
+
+// AP 설정
+const char* ssid = "ESP32-UTTEC";      // WiFi 이름
+const char* password = "12345678";      // WiFi 비밀번호
+
+void setup() {
+  Serial.begin(115200);
+
+  // AP 모드로 시작
+  WiFi.softAP(ssid, password);
+
+  // AP의 IP 주소 출력
+  Serial.println("AP 모드 시작!");
+  Serial.print("SSID: ");
+  Serial.println(ssid);
+  Serial.print("IP 주소: ");
+  Serial.println(WiFi.softAPIP());
+}
+
+void loop() {
+  // 연결된 기기 수 출력
+  int clients = WiFi.softAPgetStationNum();
+  Serial.print("연결된 기기: ");
+  Serial.println(clients);
+  delay(3000);
+}</code>
+                    </div>
+                    <p><strong>해보기:</strong></p>
+                    <ol>
+                        <li>코드를 업로드하고 시리얼 모니터를 열어보세요</li>
+                        <li>스마트폰의 WiFi 설정에서 "ESP32-UTTEC"을 찾아보세요</li>
+                        <li>비밀번호 "12345678"을 입력해서 연결해보세요</li>
+                        <li>시리얼 모니터에서 연결된 기기 수를 확인하세요</li>
+                    </ol>
+                </div>
+
+                <div class="activity-card">
+                    <h4>🔐 활동 2: WiFi 이름과 비밀번호 바꾸기</h4>
+                    <p>나만의 WiFi 이름과 비밀번호를 만들어봐요!</p>
+                    <div class="code-box">
+<code>#include &lt;WiFi.h&gt;
+
+// 여기를 바꿔보세요!
+const char* ssid = "MyESP32";           // 원하는 이름
+const char* password = "mypassword";    // 원하는 비밀번호 (8자 이상)
+
+void setup() {
+  Serial.begin(115200);
+
+  WiFi.softAP(ssid, password);
+
+  Serial.println("나만의 WiFi AP 생성 완료!");
+  Serial.print("WiFi 이름: ");
+  Serial.println(ssid);
+  Serial.print("IP 주소: ");
+  Serial.println(WiFi.softAPIP());
+}
+
+void loop() {
+  delay(1000);
+}</code>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h4>📊 활동 3: AP 정보 자세히 보기</h4>
+                    <p>AP의 다양한 정보를 확인해봐요!</p>
+                    <div class="code-box">
+<code>#include &lt;WiFi.h&gt;
+
+const char* ssid = "ESP32-UTTEC";
+const char* password = "12345678";
+
+void setup() {
+  Serial.begin(115200);
+
+  WiFi.softAP(ssid, password);
+
+  Serial.println("\n=== WiFi AP 정보 ===");
+  Serial.print("SSID: ");
+  Serial.println(ssid);
+  Serial.print("IP 주소: ");
+  Serial.println(WiFi.softAPIP());
+  Serial.print("MAC 주소: ");
+  Serial.println(WiFi.softAPmacAddress());
+  Serial.print("채널: ");
+  Serial.println(WiFi.channel());
+  Serial.println("===================\n");
+}
+
+void loop() {
+  static int lastClients = 0;
+  int clients = WiFi.softAPgetStationNum();
+
+  // 연결 기기 수가 변경되면 알림
+  if(clients != lastClients) {
+    Serial.print("연결된 기기 수: ");
+    Serial.println(clients);
+    lastClients = clients;
+  }
+
+  delay(1000);
+}</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🚀</span>
+                    도전 과제
+                </h2>
+
+                <div class="challenge-box">
+                    <h3>🏆 스스로 해보기</h3>
+                    <ul>
+                        <li>🌟 WiFi 이름에 한글을 사용해보세요</li>
+                        <li>🌟🌟 비밀번호 없는 개방 AP 만들기 (password를 빈 문자열로)</li>
+                        <li>🌟🌟 연결된 기기가 있을 때 LED 켜기</li>
+                        <li>🌟🌟🌟 연결된 기기 수만큼 LED 깜빡이기</li>
+                        <li>🌟🌟🌟 기기가 연결되거나 해제될 때 부저로 소리내기</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">📝</span>
+                    정리하기
+                </h2>
+
+                <div class="concept-box">
+                    <h3>✅ 오늘 배운 내용</h3>
+                    <p>
+                        <strong>1. WiFi:</strong> 무선으로 인터넷에 연결하는 기술
+                    </p>
+                    <p>
+                        <strong>2. AP 모드:</strong> ESP32를 공유기처럼 만들어서 다른 기기가 연결
+                    </p>
+                    <p>
+                        <strong>3. WiFi.softAP():</strong> AP 모드를 시작하는 함수
+                    </p>
+                    <p>
+                        <strong>4. WiFi.softAPgetStationNum():</strong> 연결된 기기 수 확인
+                    </p>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <a href="../week2_summary.html" class="nav-button prev">⬅️ Week 2 목차로</a>
+                <a href="../day_7/README.html" class="nav-button next">Day 7: WiFi AP 웹 서버 ➡️</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-logo">(주)UTTEC</div>
+            <p>IoT와 AI를 배우는 즐거운 여정</p>
+            <p>ESP32-WROOM AI Kit으로 미래를 만들어가요!</p>
+        </div>
+    </div>
+</body>
+</html>

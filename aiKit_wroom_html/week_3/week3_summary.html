@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3주차 - 센서와 종합 프로젝트</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .uttec-logo {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: white;
+            color: #f5576c;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.3em;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        .week-intro {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .week-intro h2 {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .week-intro p {
+            font-size: 1.3em;
+            color: #2c3e50;
+            line-height: 1.8;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .day-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            border-top: 6px solid;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+        }
+
+        .day-card.day11 {
+            border-top-color: #e74c3c;
+            background: linear-gradient(135deg, #fff 0%, #ffe8e8 100%);
+        }
+
+        .day-card.day12 {
+            border-top-color: #f39c12;
+            background: linear-gradient(135deg, #fff 0%, #fff4e0 100%);
+        }
+
+        .day-card.day13 {
+            border-top-color: #27ae60;
+            background: linear-gradient(135deg, #fff 0%, #e8f5e9 100%);
+        }
+
+        .day-card.day14 {
+            border-top-color: #2980b9;
+            background: linear-gradient(135deg, #fff 0%, #e8f4ff 100%);
+        }
+
+        .day-card.day15 {
+            border-top-color: #9b59b6;
+            background: linear-gradient(135deg, #fff 0%, #f4e8ff 100%);
+        }
+
+        .day-number {
+            font-size: 3em;
+            font-weight: bold;
+            opacity: 0.1;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .day-card h3 {
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .day-card .emoji {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .day-card p {
+            color: #555;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .topics {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .topics li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #2c3e50;
+        }
+
+        .topics li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+
+        .projects {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .projects h4 {
+            color: #f5576c;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .project-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            margin: 5px;
+            transition: all 0.3s;
+            font-size: 0.95em;
+        }
+
+        .project-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(245,87,108,0.4);
+        }
+
+        .learning-goals {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 50px 0;
+        }
+
+        .learning-goals h2 {
+            color: #2c3e50;
+            font-size: 2.2em;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .goal-item {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .goal-item .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .goal-item h3 {
+            color: #f5576c;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .timeline {
+            margin: 50px 0;
+            position: relative;
+        }
+
+        .timeline h2 {
+            color: #2c3e50;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        footer .uttec-brand {
+            font-size: 2em;
+            font-weight: bold;
+            color: #f5576c;
+            margin-bottom: 15px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 25px;
+            }
+
+            header h1 {
+                font-size: 2em;
+            }
+
+            .days-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .goals-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="uttec-logo">(주)UTTEC</div>
+            <h1>🎓 3주차 학습 여정</h1>
+            <p style="font-size: 1.4em; margin-top: 15px;">센서와 종합 프로젝트의 세계로!</p>
+        </header>
+
+        <div class="content">
+            <!-- 주차 소개 -->
+            <div class="week-intro">
+                <h2>🌟 3주차에서 배울 내용</h2>
+                <p>
+                    부저, 센서, 디스플레이 등 다양한 부품을 다루고,<br>
+                    배운 모든 것을 활용한 종합 프로젝트를 완성해요!<br>
+                    진정한 IoT 프로젝트의 완성입니다! 🚀
+                </p>
+            </div>
+
+            <!-- 학습 목표 -->
+            <div class="learning-goals">
+                <h2>🎯 이번 주 학습 목표</h2>
+                <div class="goals-grid">
+                    <div class="goal-item">
+                        <div class="icon">🔊</div>
+                        <h3>출력 장치</h3>
+                        <p>부저와 멜로디를 제어하여 소리를 내요</p>
+                    </div>
+                    <div class="goal-item">
+                        <div class="icon">🌡️</div>
+                        <h3>센서 활용</h3>
+                        <p>온습도 센서에서 데이터를 읽고 처리해요</p>
+                    </div>
+                    <div class="goal-item">
+                        <div class="icon">📺</div>
+                        <h3>디스플레이</h3>
+                        <p>OLED 디스플레이에 정보를 표시해요</p>
+                    </div>
+                    <div class="goal-item">
+                        <div class="icon">🏆</div>
+                        <h3>종합 프로젝트</h3>
+                        <p>배운 모든 기술을 활용하여 멋진 작품을 만들어요</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 일별 학습 내용 -->
+            <div class="timeline">
+                <h2>📅 일별 학습 계획</h2>
+                <div class="days-grid">
+                    <!-- Day 11 -->
+                    <div class="day-card day11">
+                        <div class="day-number">11</div>
+                        <span class="emoji">🔊</span>
+                        <h3>Day 11: 부저 소리 내기</h3>
+                        <p>부저를 제어하여 다양한 음향 효과를 만들어요!</p>
+                        <ul class="topics">
+                            <li>부저 제어 기초</li>
+                            <li>음정 조절하기</li>
+                            <li>tone() 함수 사용</li>
+                            <li>리듬감 있는 신호음</li>
+                        </ul>
+                        <div class="projects">
+                            <h4>📂 프로젝트</h4>
+                            <a href="day_11/README.html" class="project-link">alarm</a>
+                            <a href="day_11/README.html" class="project-link">beep_chat</a>
+                            <a href="day_11/README.html" class="project-link">beep_deep</a>
+                        </div>
+                    </div>
+
+                    <!-- Day 12 -->
+                    <div class="day-card day12">
+                        <div class="day-number">12</div>
+                        <span class="emoji">🎵</span>
+                        <h3>Day 12: 멜로디 연주하기</h3>
+                        <p>부저로 친숙한 멜로디를 연주해요!</p>
+                        <ul class="topics">
+                            <li>음표와 음길이</li>
+                            <li>멜로디 데이터 구조</li>
+                            <li>배열로 음악 제어</li>
+                            <li>유명한 멜로디 구현</li>
+                        </ul>
+                        <div class="projects">
+                            <h4>📂 프로젝트</h4>
+                            <a href="day_12/README.html" class="project-link">melody_chat</a>
+                            <a href="day_12/README.html" class="project-link">melody_deep</a>
+                            <a href="day_12/README.html" class="project-link">simple</a>
+                        </div>
+                    </div>
+
+                    <!-- Day 13 -->
+                    <div class="day-card day13">
+                        <div class="day-number">13</div>
+                        <span class="emoji">🌡️</span>
+                        <h3>Day 13: 온습도 센서</h3>
+                        <p>DHT 센서에서 온도와 습도를 측정해요!</p>
+                        <ul class="topics">
+                            <li>DHT 센서 작동 원리</li>
+                            <li>센서 데이터 읽기</li>
+                            <li>온습도 계산</li>
+                            <li>센서 오류 처리</li>
+                        </ul>
+                        <div class="projects">
+                            <h4>📂 프로젝트</h4>
+                            <a href="day_13/README.html" class="project-link">sensor</a>
+                            <a href="day_13/README.html" class="project-link">sensor_chat</a>
+                            <a href="day_13/README.html" class="project-link">sensor_deep</a>
+                        </div>
+                    </div>
+
+                    <!-- Day 14 -->
+                    <div class="day-card day14">
+                        <div class="day-number">14</div>
+                        <span class="emoji">📺</span>
+                        <h3>Day 14: OLED 디스플레이</h3>
+                        <p>OLED 화면에 텍스트와 그래픽을 표시해요!</p>
+                        <ul class="topics">
+                            <li>OLED 디스플레이 초기화</li>
+                            <li>텍스트 표시</li>
+                            <li>도형 그리기</li>
+                            <li>디스플레이 애니메이션</li>
+                        </ul>
+                        <div class="projects">
+                            <h4>📂 프로젝트</h4>
+                            <a href="day_14/README.html" class="project-link">display_chat</a>
+                            <a href="day_14/README.html" class="project-link">display_deep</a>
+                            <a href="day_14/README.html" class="project-link">myDisplay</a>
+                            <a href="day_14/README.html" class="project-link">simple</a>
+                        </div>
+                    </div>
+
+                    <!-- Day 15 -->
+                    <div class="day-card day15">
+                        <div class="day-number">15</div>
+                        <span class="emoji">🏆</span>
+                        <h3>Day 15: 종합 프로젝트</h3>
+                        <p>3주간 배운 모든 기술을 활용한 최종 프로젝트를 완성해요!</p>
+                        <ul class="topics">
+                            <li>프로젝트 기획 및 설계</li>
+                            <li>센서, 출력장치, 디스플레이 통합</li>
+                            <li>복잡한 제어 로직 구현</li>
+                            <li>프로젝트 최적화 및 완성</li>
+                        </ul>
+                        <div class="projects">
+                            <h4>📂 프로젝트</h4>
+                            <a href="day_15/README.html" class="project-link">chat</a>
+                            <a href="day_15/README.html" class="project-link">deep</a>
+                            <a href="day_15/README.html" class="project-link">gemini</a>
+                            <a href="day_15/README.html" class="project-link">final_chat</a>
+                            <a href="day_15/README.html" class="project-link">final_deep</a>
+                            <a href="day_15/README.html" class="project-link">final_gemini</a>
+                            <a href="day_15/README.html" class="project-link">chat_money</a>
+                            <a href="day_15/README.html" class="project-link">chat_money_deco</a>
+                            <a href="day_15/README.html" class="project-link">final_gemini_file</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 네비게이션 버튼 -->
+            <div class="nav-buttons">
+                <a href="../week_2/week2_summary.html" class="nav-btn">← 이전 주</a>
+                <a href="../index.html" class="nav-btn">🏠 메인으로</a>
+            </div>
+        </div>
+
+        <footer>
+            <div class="uttec-brand">🌟 (주)UTTEC</div>
+            <p style="font-size: 1.2em;">초등학생을 위한 IoT 코딩 교육</p>
+            <p style="margin-top: 15px; opacity: 0.8;">함께 배우고, 만들고, 성장해요!</p>
+            <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.7;">
+                © 2024 UTTEC. All rights reserved.
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

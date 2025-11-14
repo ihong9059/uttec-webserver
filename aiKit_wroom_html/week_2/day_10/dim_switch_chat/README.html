@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 10: LED 밝기 조절 + 스위치</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .uttec-logo {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: white;
+            color: #f5576c;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #f5576c;
+        }
+
+        .goal-box {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 3px solid #fdcb6e;
+        }
+
+        .goal-box h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .goal-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .goal-box li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        .goal-box li:before {
+            content: "✨";
+            position: absolute;
+            left: 0;
+            font-size: 1.2em;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .concept-box h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .control-demo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .slider {
+            width: 200px;
+            height: 15px;
+            border-radius: 10px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(245, 87, 108, 0.5);
+        }
+
+        .arrow {
+            font-size: 2em;
+            color: #667eea;
+        }
+
+        .code-box {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .code-box pre {
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .comment {
+            color: #95a5a6;
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 8px solid #fcb69f;
+        }
+
+        .activity-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+            counter-reset: step-counter;
+        }
+
+        .step-list li {
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 10px;
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 60px;
+        }
+
+        .step-list li:before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .tip-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .tip-box strong {
+            color: #856404;
+            font-size: 1.2em;
+        }
+
+        .fun-fact {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .fun-fact h3 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        footer .uttec-brand {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #f5576c;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .control-demo {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="uttec-logo">(주)UTTEC</div>
+            <h1>💡 Day 10: LED 밝기 조절 + 스위치</h1>
+            <p style="font-size: 1.2em; margin-top: 10px;">웹에서 LED를 자유자재로 제어해보자!</p>
+        </header>
+
+        <div class="content">
+            <!-- 학습 목표 -->
+            <div class="section">
+                <h2 class="section-title">🎯 오늘 배울 내용</h2>
+                <div class="goal-box">
+                    <h3>학습 목표</h3>
+                    <ul>
+                        <li>HTML 슬라이더로 LED 밝기 조절하기</li>
+                        <li>버튼으로 LED 켜기/끄기 하기</li>
+                        <li>웹 페이지에서 서버로 명령 보내기</li>
+                        <li>GET 요청이란 무엇인지 배우기</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 웹 제어 개념 -->
+            <div class="section">
+                <h2 class="section-title">🌟 웹으로 기기 제어하기</h2>
+                <div class="concept-box">
+                    <h3>원격 제어(Remote Control)</h3>
+                    <p style="font-size: 1.1em; margin-bottom: 15px; color: #2c3e50;">
+                        스마트 전등, 스마트 TV, 로봇청소기... 이런 물건들은 모두 앱이나 웹으로 제어할 수 있어요!
+                    </p>
+                    <p style="font-size: 1.1em; color: #2c3e50;">
+                        그 비결은 바로 무선 통신이에요. 핸드폰 앱이 "불을 켜"라는 명령을 WiFi로 보내고,
+                        기기가 그 명령을 받아서 실행하는 거죠.
+                        오늘은 우리도 웹 페이지로 LED를 제어해볼 거예요! 😄
+                    </p>
+                </div>
+
+                <div class="control-demo">
+                    <div>
+                        <p style="text-align: center; font-weight: bold;">📱 웹 브라우저</p>
+                        <input type="range" min="0" max="100" class="slider" value="50" style="margin-top: 15px;">
+                    </div>
+                    <div class="arrow">→</div>
+                    <div>
+                        <p style="text-align: center; font-weight: bold;">📡 WiFi 신호</p>
+                        <p style="text-align: center; color: #667eea; font-size: 2em; margin-top: 15px;">📶</p>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div>
+                        <p style="text-align: center; font-weight: bold;">💡 LED</p>
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: #ffeb3b; box-shadow: 0 0 20px #ffeb3b; margin: 15px auto;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 코드 설명 -->
+            <div class="section">
+                <h2 class="section-title">💻 프로그램 코드</h2>
+                <div class="code-box">
+<pre><span class="comment">// ESP32 웹 서버 - LED 밝기 조절 + 버튼 제어</span>
+
+#include &lt;WiFi.h&gt;
+
+const char* ssid = "ESP32_LED";
+const char* password = "12345678";
+const int LED_PIN = 5;
+
+WiFiServer server(80);
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(LED_PIN, OUTPUT);
+
+  WiFi.softAP(ssid, password);
+  server.begin();
+  Serial.println("웹 서버 시작!");
+}
+
+void loop() {
+  WiFiClient client = server.available();
+
+  if (client) {
+    String request = client.readStringUntil('\r');
+
+    <span class="comment">// LED 제어 명령 확인</span>
+    if (request.indexOf("/led=") != -1) {
+      int startIdx = request.indexOf("=") + 1;
+      int endIdx = request.indexOf(" ", startIdx);
+      String valueStr = request.substring(startIdx, endIdx);
+      int brightness = valueStr.toInt();
+
+      analogWrite(LED_PIN, brightness);
+      Serial.println("밝기: " + String(brightness));
+    }
+
+    <span class="comment">// HTML 웹 페이지 전송</span>
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-type:text/html");
+    client.println();
+    client.println("&lt;!DOCTYPE html&gt;");
+    client.println("&lt;html&gt;");
+    client.println("&lt;h1&gt;LED 제어&lt;/h1&gt;");
+    client.println("&lt;input type='range' min='0' max='255' id='slider'&gt;");
+    client.println("&lt;/html&gt;");
+
+    client.stop();
+  }
+}</pre>
+                </div>
+
+                <div class="tip-box">
+                    <strong>💡 코드 설명</strong>
+                    <ul style="margin-top: 10px; padding-left: 20px;">
+                        <li><strong>readStringUntil('\r')</strong>: 클라이언트의 요청 읽기</li>
+                        <li><strong>indexOf()</strong>: 특정 문자 위치 찾기</li>
+                        <li><strong>substring()</strong>: 문자열의 일부 추출하기</li>
+                        <li><strong>toInt()</strong>: 문자열을 숫자로 변환</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 실습 활동 -->
+            <div class="section">
+                <h2 class="section-title">🎨 실습 활동</h2>
+                <div class="activity-card">
+                    <h3>직접 해보기!</h3>
+                    <ol class="step-list">
+                        <li>ESP32에 코드를 업로드하세요</li>
+                        <li>GPIO 5번 핀에 LED를 연결하세요</li>
+                        <li>웹 브라우저에서 192.168.4.1로 접속하세요</li>
+                        <li>슬라이더를 움직여서 LED 밝기가 변하는지 확인하세요</li>
+                        <li>시리얼 모니터에 출력되는 밝기 값을 살펴보세요</li>
+                        <li>HTML을 수정해서 ON/OFF 버튼도 추가해보세요</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 재미있는 사실 -->
+            <div class="section">
+                <div class="fun-fact">
+                    <h3>🌈 재미있는 사실!</h3>
+                    <p style="font-size: 1.2em; color: #2c3e50; margin-top: 10px;">
+                        스마트홈 기술도 바로 이런 원리로 작동해요! 여름에는 에어컨을,
+                        겨울에는 난방을 핸드폰 앱으로 제어하고, 커튼도 자동으로 열고 닫아요.
+                        심지어 외출 중에도 집의 불을 켜고 끌 수 있다니... 신기하지 않나요? 🏠
+                    </p>
+                </div>
+            </div>
+
+            <!-- 도전 과제 -->
+            <div class="section">
+                <h2 class="section-title">🚀 도전 과제</h2>
+                <div class="activity-card" style="background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);">
+                    <h3>창의력 발휘하기!</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 10px; background: white; margin: 10px 0; border-radius: 8px;">
+                            <strong>🎯 과제 1:</strong> ON/OFF 버튼 추가하기
+                        </li>
+                        <li style="padding: 10px; background: white; margin: 10px 0; border-radius: 8px;">
+                            <strong>🎯 과제 2:</strong> "밝기를 50%로 설정" 같은 빠른 버튼 만들기
+                        </li>
+                        <li style="padding: 10px; background: white; margin: 10px 0; border-radius: 8px;">
+                            <strong>🎯 과제 3:</strong> 현재 LED 밝기를 웹 페이지에 숫자로 표시하기
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="uttec-brand">⚡ (주)UTTEC</div>
+            <p>IoT와 함께하는 신나는 코딩 수업</p>
+            <p style="margin-top: 10px; opacity: 0.8;">배우고, 만들고, 즐기자!</p>
+        </footer>
+    </div>
+</body>
+</html>

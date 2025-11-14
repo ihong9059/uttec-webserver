@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 7: WiFi AP 웹 서버 만들기 - UTTEC AI Kit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(3, 169, 244, 0.15);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #03a9f4 0%, #29b6f6 50%, #4fc3f7 100%);
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .logo {
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .day-title {
+            font-size: 48px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: rgba(255,255,255,0.95);
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        .section {
+            margin-bottom: 50px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section-title {
+            font-size: 32px;
+            color: #03a9f4;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 4px solid #4fc3f7;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon {
+            font-size: 40px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .objective-list {
+            background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+            padding: 30px;
+            border-radius: 20px;
+            border-left: 6px solid #03a9f4;
+            margin-bottom: 30px;
+        }
+
+        .objective-list li {
+            font-size: 20px;
+            line-height: 2;
+            color: #333;
+            margin-left: 30px;
+            padding: 10px 0;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #ffffff 0%, #e1f5fe 100%);
+            padding: 35px;
+            border-radius: 20px;
+            margin: 25px 0;
+            border: 3px solid #4fc3f7;
+            box-shadow: 0 10px 30px rgba(3, 169, 244, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .concept-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(3, 169, 244, 0.2);
+        }
+
+        .concept-box h3 {
+            color: #03a9f4;
+            font-size: 26px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .concept-box p {
+            font-size: 19px;
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 15px;
+        }
+
+        .code-box {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            line-height: 1.6;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-box code {
+            color: #a6e22e;
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px 0;
+            border: 3px solid #03a9f4;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .activity-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(3, 169, 244, 0.25);
+        }
+
+        .activity-card h4 {
+            color: #0288d1;
+            font-size: 24px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .activity-card ol, .activity-card ul {
+            margin-left: 25px;
+        }
+
+        .activity-card li {
+            font-size: 18px;
+            line-height: 1.9;
+            color: #333;
+            margin: 12px 0;
+            padding: 8px 0;
+        }
+
+        .challenge-box {
+            background: linear-gradient(135deg, #03a9f4 0%, #29b6f6 100%);
+            color: white;
+            padding: 35px;
+            border-radius: 20px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(3, 169, 244, 0.3);
+        }
+
+        .challenge-box h3 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .challenge-box ul {
+            margin-left: 25px;
+        }
+
+        .challenge-box li {
+            font-size: 19px;
+            line-height: 2;
+            margin: 12px 0;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            gap: 20px;
+        }
+
+        .nav-button {
+            flex: 1;
+            padding: 20px 30px;
+            border-radius: 15px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-button.prev {
+            background: linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%);
+            color: white;
+        }
+
+        .nav-button.next {
+            background: linear-gradient(135deg, #03a9f4 0%, #0288d1 100%);
+            color: white;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            text-align: center;
+            padding: 40px;
+            margin-top: 50px;
+        }
+
+        .footer-logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .footer p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 30px 20px;
+            }
+
+            .day-title {
+                font-size: 36px;
+            }
+
+            .section-title {
+                font-size: 26px;
+            }
+
+            .navigation {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">(주)UTTEC - AI Kit 교육과정</div>
+            <div class="day-title">Day 7</div>
+            <div class="subtitle">WiFi AP 웹 서버 만들기</div>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🎯</span>
+                    학습 목표
+                </h2>
+                <div class="objective-list">
+                    <ul>
+                        <li>웹 서버가 무엇인지 이해하기</li>
+                        <li>ESP32로 간단한 웹 서버 만들기</li>
+                        <li>HTML 페이지를 ESP32에서 제공하기</li>
+                        <li>스마트폰 브라우저로 ESP32 웹 페이지 접속하기</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">💡</span>
+                    핵심 개념
+                </h2>
+
+                <div class="concept-box">
+                    <h3>🌐 웹 서버란?</h3>
+                    <p>
+                        웹 서버는 인터넷으로 웹 페이지를 제공하는 컴퓨터예요.
+                        우리가 웹 브라우저(크롬, 사파리 등)로 웹사이트에 접속하면,
+                        웹 서버가 HTML 파일을 보내주어 화면에 표시되는 거예요!
+                    </p>
+                    <p>
+                        ESP32도 작은 웹 서버가 될 수 있어요.
+                        스마트폰의 웹 브라우저로 ESP32에 접속하면 웹 페이지를 볼 수 있답니다!
+                    </p>
+                </div>
+
+                <div class="concept-box">
+                    <h3>📋 HTTP 요청과 응답</h3>
+                    <p>웹 브라우저와 웹 서버는 HTTP라는 규칙으로 대화해요:</p>
+                    <ul>
+                        <li><strong>요청(Request):</strong> "웹 페이지를 보여주세요!" (브라우저 → 서버)</li>
+                        <li><strong>응답(Response):</strong> "여기 페이지 있어요!" (서버 → 브라우저)</li>
+                    </ul>
+                </div>
+
+                <div class="concept-box">
+                    <h3>🏗️ HTML이란?</h3>
+                    <p>
+                        HTML은 웹 페이지를 만드는 언어예요.
+                        글자, 그림, 버튼 등을 어떻게 배치할지 정하는 코드랍니다!
+                    </p>
+                    <div class="code-box">
+<code>&lt;html&gt;
+  &lt;body&gt;
+    &lt;h1&gt;안녕하세요!&lt;/h1&gt;
+    &lt;p&gt;ESP32 웹 서버입니다.&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🔨</span>
+                    실습 활동
+                </h2>
+
+                <div class="activity-card">
+                    <h4>🌐 활동 1: 첫 번째 웹 서버 만들기</h4>
+                    <p>ESP32로 간단한 웹 페이지를 제공하는 서버를 만들어봐요!</p>
+                    <div class="code-box">
+<code>#include &lt;WiFi.h&gt;
+#include &lt;WebServer.h&gt;
+
+const char* ssid = "ESP32-UTTEC";
+const char* password = "12345678";
+
+WebServer server(80);  // 80번 포트로 웹 서버 시작
+
+void handleRoot() {
+  String html = "&lt;html&gt;&lt;body&gt;";
+  html += "&lt;h1&gt;ESP32 웹 서버&lt;/h1&gt;";
+  html += "&lt;p&gt;안녕하세요! UTTEC AI Kit입니다.&lt;/p&gt;";
+  html += "&lt;/body&gt;&lt;/html&gt;";
+
+  server.send(200, "text/html", html);
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  WiFi.softAP(ssid, password);
+  Serial.println("AP 시작!");
+  Serial.print("IP 주소: ");
+  Serial.println(WiFi.softAPIP());
+
+  server.on("/", handleRoot);
+  server.begin();
+  Serial.println("웹 서버 시작!");
+}
+
+void loop() {
+  server.handleClient();
+}</code>
+                    </div>
+                    <p><strong>해보기:</strong></p>
+                    <ol>
+                        <li>코드를 업로드하고 시리얼 모니터에서 IP 주소 확인</li>
+                        <li>스마트폰을 "ESP32-UTTEC" WiFi에 연결</li>
+                        <li>브라우저를 열고 IP 주소 입력 (예: 192.168.4.1)</li>
+                        <li>웹 페이지가 표시되는지 확인!</li>
+                    </ol>
+                </div>
+
+                <div class="activity-card">
+                    <h4>🎨 활동 2: 예쁜 웹 페이지 만들기</h4>
+                    <p>CSS를 사용해서 웹 페이지를 꾸며봐요!</p>
+                    <div class="code-box">
+<code>void handleRoot() {
+  String html = "&lt;html&gt;&lt;head&gt;";
+  html += "&lt;meta charset='UTF-8'&gt;";
+  html += "&lt;style&gt;";
+  html += "body { font-family: Arial; background: #e3f2fd; text-align: center; }";
+  html += "h1 { color: #2196f3; font-size: 48px; }";
+  html += "p { font-size: 24px; color: #555; }";
+  html += ".box { background: white; padding: 40px; ";
+  html += "border-radius: 20px; margin: 50px auto; ";
+  html += "max-width: 600px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }";
+  html += "&lt;/style&gt;&lt;/head&gt;&lt;body&gt;";
+  html += "&lt;div class='box'&gt;";
+  html += "&lt;h1&gt;UTTEC AI Kit&lt;/h1&gt;";
+  html += "&lt;p&gt;ESP32 웹 서버에 오신 것을 환영합니다!&lt;/p&gt;";
+  html += "&lt;p&gt;접속 시간: " + String(millis()/1000) + "초&lt;/p&gt;";
+  html += "&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;";
+
+  server.send(200, "text/html", html);
+}</code>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h4>📄 활동 3: 여러 페이지 만들기</h4>
+                    <p>여러 개의 페이지를 가진 웹 서버를 만들어봐요!</p>
+                    <div class="code-box">
+<code>#include &lt;WiFi.h&gt;
+#include &lt;WebServer.h&gt;
+
+const char* ssid = "ESP32-UTTEC";
+const char* password = "12345678";
+
+WebServer server(80);
+
+void handleRoot() {
+  String html = "&lt;html&gt;&lt;body&gt;";
+  html += "&lt;h1&gt;홈 페이지&lt;/h1&gt;";
+  html += "&lt;p&gt;&lt;a href='/about'&gt;소개 페이지&lt;/a&gt;&lt;/p&gt;";
+  html += "&lt;p&gt;&lt;a href='/info'&gt;정보 페이지&lt;/a&gt;&lt;/p&gt;";
+  html += "&lt;/body&gt;&lt;/html&gt;";
+  server.send(200, "text/html", html);
+}
+
+void handleAbout() {
+  String html = "&lt;html&gt;&lt;body&gt;";
+  html += "&lt;h1&gt;소개&lt;/h1&gt;";
+  html += "&lt;p&gt;UTTEC AI Kit - ESP32 학습 프로젝트&lt;/p&gt;";
+  html += "&lt;p&gt;&lt;a href='/'&gt;홈으로&lt;/a&gt;&lt;/p&gt;";
+  html += "&lt;/body&gt;&lt;/html&gt;";
+  server.send(200, "text/html", html);
+}
+
+void handleInfo() {
+  String html = "&lt;html&gt;&lt;body&gt;";
+  html += "&lt;h1&gt;시스템 정보&lt;/h1&gt;";
+  html += "&lt;p&gt;가동 시간: " + String(millis()/1000) + "초&lt;/p&gt;";
+  html += "&lt;p&gt;연결된 기기: " + String(WiFi.softAPgetStationNum()) + "개&lt;/p&gt;";
+  html += "&lt;p&gt;&lt;a href='/'&gt;홈으로&lt;/a&gt;&lt;/p&gt;";
+  html += "&lt;/body&gt;&lt;/html&gt;";
+  server.send(200, "text/html", html);
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  WiFi.softAP(ssid, password);
+  Serial.print("IP: ");
+  Serial.println(WiFi.softAPIP());
+
+  server.on("/", handleRoot);
+  server.on("/about", handleAbout);
+  server.on("/info", handleInfo);
+  server.begin();
+}
+
+void loop() {
+  server.handleClient();
+}</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🚀</span>
+                    도전 과제
+                </h2>
+
+                <div class="challenge-box">
+                    <h3>🏆 스스로 해보기</h3>
+                    <ul>
+                        <li>🌟 자기소개 페이지 만들기 (이름, 학년 등)</li>
+                        <li>🌟🌟 웹 페이지에 그림(이모지) 추가하기</li>
+                        <li>🌟🌟 방문 횟수를 세는 카운터 만들기</li>
+                        <li>🌟🌟🌟 다양한 색상 테마로 여러 페이지 만들기</li>
+                        <li>🌟🌟🌟 ESP32 상태를 실시간으로 보여주는 페이지</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">📝</span>
+                    정리하기
+                </h2>
+
+                <div class="concept-box">
+                    <h3>✅ 오늘 배운 내용</h3>
+                    <p>
+                        <strong>1. 웹 서버:</strong> 웹 페이지를 제공하는 프로그램
+                    </p>
+                    <p>
+                        <strong>2. WebServer 라이브러리:</strong> ESP32로 웹 서버 만들기
+                    </p>
+                    <p>
+                        <strong>3. HTML:</strong> 웹 페이지를 구성하는 언어
+                    </p>
+                    <p>
+                        <strong>4. server.on():</strong> 특정 주소에 대한 응답 설정
+                    </p>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <a href="../week2_summary.html" class="nav-button prev">⬅️ Week 2 목차로</a>
+                <a href="../day_6/README.html" class="nav-button prev">⬅️ Day 6: WiFi 기초</a>
+                <a href="../day_8/README.html" class="nav-button next">Day 8: 웹으로 LED 제어 ➡️</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-logo">(주)UTTEC</div>
+            <p>IoT와 AI를 배우는 즐거운 여정</p>
+            <p>ESP32-WROOM AI Kit으로 미래를 만들어가요!</p>
+        </div>
+    </div>
+</body>
+</html>

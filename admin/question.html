@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>질문 상세 - UTTEC AI 교육</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { font-size: 1.8em; }
+        .btn-back {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-back:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+        .question-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .question-header {
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .question-title {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .question-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            color: #666;
+            font-size: 0.95em;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-answered {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-closed {
+            background: #e0e0e0;
+            color: #666;
+        }
+        .category-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        .question-content {
+            line-height: 1.8;
+            color: #2c3e50;
+            font-size: 1.1em;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            white-space: pre-wrap;
+        }
+        .section-title {
+            font-size: 1.3em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .answer-form {
+            margin-top: 30px;
+        }
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+            border: 2px solid #4caf50;
+        }
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+            border: 2px solid #f44336;
+        }
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #999;
+            font-size: 1.2em;
+        }
+        .answer-display {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .answer-display-title {
+            font-weight: 600;
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        .answer-display-content {
+            line-height: 1.8;
+            color: #2c3e50;
+            white-space: pre-wrap;
+        }
+        .answer-display-date {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #c3e6cb;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📝 질문 상세</h1>
+        <a href="/admin/dashboard.html" class="btn-back">← 대시보드</a>
+    </div>
+
+    <div class="container">
+        <div class="success-message" id="successMessage"></div>
+        <div class="error-message" id="errorMessage"></div>
+
+        <div id="loadingDiv" class="loading">질문을 불러오는 중...</div>
+
+        <div id="questionContent" style="display: none;">
+            <div class="question-card">
+                <div class="question-header">
+                    <h2 class="question-title" id="questionTitle"></h2>
+                    <div class="question-meta">
+                        <div class="meta-item">
+                            <strong>학생:</strong>
+                            <span id="studentName"></span>
+                        </div>
+                        <div class="meta-item">
+                            <strong>이메일:</strong>
+                            <span id="studentEmail"></span>
+                        </div>
+                        <div class="meta-item">
+                            <strong>카테고리:</strong>
+                            <span id="category" class="category-badge"></span>
+                        </div>
+                        <div class="meta-item">
+                            <strong>상태:</strong>
+                            <span id="status" class="status-badge"></span>
+                        </div>
+                        <div class="meta-item">
+                            <strong>등록일:</strong>
+                            <span id="createdAt"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="section-title">질문 내용</h3>
+                    <div class="question-content" id="questionContentText"></div>
+                </div>
+
+                <div id="existingAnswer" style="display: none;">
+                    <h3 class="section-title">작성된 답변</h3>
+                    <div class="answer-display">
+                        <div class="answer-display-title">✅ 답변 완료</div>
+                        <div class="answer-display-content" id="answerText"></div>
+                        <div class="answer-display-date" id="answeredAt"></div>
+                    </div>
+                </div>
+
+                <div id="answerFormDiv" class="answer-form">
+                    <h3 class="section-title">답변 작성</h3>
+                    <textarea id="answerInput" placeholder="학생에게 보낼 답변을 입력하세요...&#10;&#10;답변은 학생의 이메일로 전송됩니다."></textarea>
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="submitAnswer()">✉️ 답변 제출 및 이메일 발송</button>
+                        <select id="statusSelect" class="btn btn-secondary" onchange="updateStatus()">
+                            <option value="">상태 변경</option>
+                            <option value="pending">대기 중</option>
+                            <option value="answered">답변 완료</option>
+                            <option value="closed">종료</option>
+                        </select>
+                        <button class="btn btn-danger" onclick="deleteQuestion()">🗑️ 삭제</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = null;
+
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/admin/verify');
+                const result = await response.json();
+                if (!result.authenticated) {
+                    window.location.href = '/admin/login.html';
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.href = '/admin/login.html';
+            }
+        }
+
+        async function loadQuestion() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const questionId = urlParams.get('id');
+
+            if (!questionId) {
+                showError('질문 ID가 없습니다.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/questions');
+                const result = await response.json();
+
+                if (result.success) {
+                    currentQuestion = result.questions.find(q => q.id == questionId);
+                    if (currentQuestion) {
+                        displayQuestion(currentQuestion);
+                    } else {
+                        showError('질문을 찾을 수 없습니다.');
+                    }
+                } else {
+                    throw new Error(result.error || '질문을 불러올 수 없습니다.');
+                }
+            } catch (error) {
+                console.error('Load error:', error);
+                showError('질문을 불러올 수 없습니다: ' + error.message);
+            }
+        }
+
+        function displayQuestion(question) {
+            document.getElementById('loadingDiv').style.display = 'none';
+            document.getElementById('questionContent').style.display = 'block';
+
+            document.getElementById('questionTitle').textContent = question.subject;
+            document.getElementById('studentName').textContent = question.student_name;
+            document.getElementById('studentEmail').textContent = question.student_email;
+            document.getElementById('category').textContent = getCategoryName(question.category);
+
+            const statusBadge = document.getElementById('status');
+            statusBadge.textContent = getStatusName(question.status);
+            statusBadge.className = 'status-badge status-' + question.status;
+
+            document.getElementById('createdAt').textContent = formatDate(question.created_at);
+            document.getElementById('questionContentText').textContent = question.content;
+
+            if (question.answer) {
+                document.getElementById('existingAnswer').style.display = 'block';
+                document.getElementById('answerText').textContent = question.answer;
+                document.getElementById('answeredAt').textContent = '답변일: ' + formatDate(question.answered_at);
+                document.getElementById('answerInput').value = question.answer;
+            }
+        }
+
+        function getCategoryName(category) {
+            const names = {
+                'week1': 'Week 1 - ESP32 기초와 LED 제어',
+                'week2': 'Week 2 - WiFi와 웹 제어',
+                'week3': 'Week 3 - 센서와 종합 프로젝트',
+                'general': '기타 질문'
+            };
+            return names[category] || category;
+        }
+
+        function getStatusName(status) {
+            const names = {
+                'pending': '대기 중',
+                'answered': '답변 완료',
+                'closed': '종료'
+            };
+            return names[status] || status;
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        async function submitAnswer() {
+            const answer = document.getElementById('answerInput').value.trim();
+            if (!answer) {
+                showError('답변을 입력해주세요.');
+                return;
+            }
+
+            if (!confirm('답변을 제출하고 이메일을 발송하시겠습니까?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/questions/${currentQuestion.id}/answer`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ answer })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showSuccess('답변이 제출되었습니다. 이메일이 발송됩니다.');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    throw new Error(result.error || '답변 제출 실패');
+                }
+            } catch (error) {
+                console.error('Submit error:', error);
+                showError('답변 제출 실패: ' + error.message);
+            }
+        }
+
+        async function updateStatus() {
+            const newStatus = document.getElementById('statusSelect').value;
+            if (!newStatus) return;
+
+            try {
+                const response = await fetch(`/api/questions/${currentQuestion.id}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showSuccess('상태가 변경되었습니다.');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    throw new Error(result.error || '상태 변경 실패');
+                }
+            } catch (error) {
+                console.error('Status update error:', error);
+                showError('상태 변경 실패: ' + error.message);
+            }
+        }
+
+        function showSuccess(message) {
+            const div = document.getElementById('successMessage');
+            div.textContent = '✅ ' + message;
+            div.style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+            window.scrollTo(0, 0);
+        }
+
+        function showError(message) {
+            const div = document.getElementById('errorMessage');
+            div.textContent = '❌ ' + message;
+            div.style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('loadingDiv').style.display = 'none';
+            window.scrollTo(0, 0);
+        }
+
+        async function deleteQuestion() {
+            if (!confirm('정말로 이 질문을 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/questions/${currentQuestion.id}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showSuccess('질문이 삭제되었습니다. 대시보드로 이동합니다.');
+                    setTimeout(() => {
+                        window.location.href = '/admin/dashboard.html';
+                    }, 1500);
+                } else {
+                    throw new Error(result.error || '삭제 실패');
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                showError('질문 삭제 실패: ' + error.message);
+            }
+        }
+
+        checkAuth();
+        loadQuestion();
+    </script>
+</body>
+</html>

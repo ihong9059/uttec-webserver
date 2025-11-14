@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 로그인 - UTTEC AI 교육</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .login-container {
+            background: white;
+            padding: 50px;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 450px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .logo-text {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 35px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 2em;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1.05em;
+        }
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        button {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+            border: 2px solid #f44336;
+        }
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 0.95em;
+            color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <div class="logo-text">⚡ UTTEC</div>
+        </div>
+
+        <h1>🔒 관리자 로그인</h1>
+        <p class="subtitle">선생님 전용 관리 페이지</p>
+
+        <div class="info-box">
+            💡 기본 계정: admin / admin123
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">아이디</label>
+                <input type="text" id="username" name="username" required placeholder="admin" autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password" required placeholder="비밀번호를 입력하세요" autocomplete="current-password">
+            </div>
+
+            <button type="submit" id="loginButton">🔓 로그인</button>
+        </form>
+
+        <div class="back-link">
+            <a href="/">← 메인 페이지로 돌아가기</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('errorMessage');
+            const loginButton = document.getElementById('loginButton');
+
+            loginButton.disabled = true;
+            loginButton.textContent = '로그인 중...';
+            errorDiv.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',  // 쿠키 포함
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // 로그인 성공 - 대시보드로 이동
+                    window.location.href = '/admin/dashboard.html';
+                } else {
+                    throw new Error(result.error || '로그인 실패');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorDiv.textContent = '❌ ' + error.message;
+                errorDiv.style.display = 'block';
+            } finally {
+                loginButton.disabled = false;
+                loginButton.textContent = '🔓 로그인';
+            }
+        });
+
+        // Enter 키로 로그인
+        document.getElementById('password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>

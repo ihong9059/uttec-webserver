@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 10: LED 밝기 조절 + 스위치 - UTTEC AI Kit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 131, 143, 0.15);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00838f 0%, #00acc1 50%, #26c6da 100%);
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .logo {
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .day-title {
+            font-size: 48px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: rgba(255,255,255,0.95);
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        .section {
+            margin-bottom: 50px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section-title {
+            font-size: 32px;
+            color: #00838f;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 4px solid #26c6da;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon {
+            font-size: 40px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .objective-list {
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            padding: 30px;
+            border-radius: 20px;
+            border-left: 6px solid #00838f;
+            margin-bottom: 30px;
+        }
+
+        .objective-list li {
+            font-size: 20px;
+            line-height: 2;
+            color: #333;
+            margin-left: 30px;
+            padding: 10px 0;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #ffffff 0%, #e0f7fa 100%);
+            padding: 35px;
+            border-radius: 20px;
+            margin: 25px 0;
+            border: 3px solid #26c6da;
+            box-shadow: 0 10px 30px rgba(0, 131, 143, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .concept-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 131, 143, 0.2);
+        }
+
+        .concept-box h3 {
+            color: #00838f;
+            font-size: 26px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .concept-box p {
+            font-size: 19px;
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 15px;
+        }
+
+        .code-box {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            line-height: 1.6;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-box code {
+            color: #a6e22e;
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px 0;
+            border: 3px solid #00838f;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .activity-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 131, 143, 0.25);
+        }
+
+        .activity-card h4 {
+            color: #006064;
+            font-size: 24px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .activity-card ol, .activity-card ul {
+            margin-left: 25px;
+        }
+
+        .activity-card li {
+            font-size: 18px;
+            line-height: 1.9;
+            color: #333;
+            margin: 12px 0;
+            padding: 8px 0;
+        }
+
+        .challenge-box {
+            background: linear-gradient(135deg, #00838f 0%, #00acc1 100%);
+            color: white;
+            padding: 35px;
+            border-radius: 20px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0, 131, 143, 0.3);
+        }
+
+        .challenge-box h3 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .challenge-box ul {
+            margin-left: 25px;
+        }
+
+        .challenge-box li {
+            font-size: 19px;
+            line-height: 2;
+            margin: 12px 0;
+        }
+
+        .celebration-box {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            padding: 40px;
+            border-radius: 20px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+            border: 3px solid #ffa000;
+        }
+
+        .celebration-box h3 {
+            color: #f57f17;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .celebration-box p {
+            color: #555;
+            font-size: 20px;
+            line-height: 1.8;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            gap: 20px;
+        }
+
+        .nav-button {
+            flex: 1;
+            padding: 20px 30px;
+            border-radius: 15px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-button.prev {
+            background: linear-gradient(135deg, #26c6da 0%, #00838f 100%);
+            color: white;
+        }
+
+        .nav-button.next {
+            background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+            color: white;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            text-align: center;
+            padding: 40px;
+            margin-top: 50px;
+        }
+
+        .footer-logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .footer p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 30px 20px;
+            }
+
+            .day-title {
+                font-size: 36px;
+            }
+
+            .section-title {
+                font-size: 26px;
+            }
+
+            .navigation {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">(주)UTTEC - AI Kit 교육과정</div>
+            <div class="day-title">Day 10</div>
+            <div class="subtitle">LED 밝기 조절 + 스위치</div>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🎯</span>
+                    학습 목표
+                </h2>
+                <div class="objective-list">
+                    <ul>
+                        <li>웹 슬라이더로 LED 밝기를 조절하는 방법 배우기</li>
+                        <li>물리 버튼/스위치의 상태를 웹에 표시하기</li>
+                        <li>입력(센서)과 출력(LED)을 함께 제어하는 IoT 시스템 만들기</li>
+                        <li>양방향 통신의 개념 이해하기</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">💡</span>
+                    핵심 개념
+                </h2>
+
+                <div class="concept-box">
+                    <h3>🎚️ HTML 슬라이더</h3>
+                    <p>
+                        HTML의 input type="range"를 사용하면 슬라이더를 만들 수 있어요.
+                        슬라이더를 움직여서 LED 밝기를 조절할 수 있답니다!
+                    </p>
+                    <div class="code-box">
+<code>&lt;input type='range' min='0' max='255' value='128'
+       onchange="location.href='/brightness?val='+this.value"&gt;</code>
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <h3>🔘 디지털 입력 읽기</h3>
+                    <p>
+                        digitalRead() 함수를 사용하면 버튼이나 스위치의 상태를 읽을 수 있어요:
+                    </p>
+                    <div class="code-box">
+<code>int buttonState = digitalRead(BUTTON_PIN);
+
+if(buttonState == HIGH) {
+  // 버튼이 눌렸어요!
+} else {
+  // 버튼이 안 눌렸어요
+}</code>
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <h3>🔄 양방향 통신</h3>
+                    <p>
+                        지금까지는 웹에서 ESP32로 명령을 보내기만 했어요 (단방향).
+                        이제는 ESP32의 상태(버튼, 센서 등)를 웹 페이지에도 표시할 거예요 (양방향)!
+                    </p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🔨</span>
+                    실습 활동
+                </h2>
+
+                <div class="activity-card">
+                    <h4>🎚️ 활동 1: 슬라이더로 LED 밝기 조절</h4>
+                    <p>웹 페이지의 슬라이더를 움직여서 LED 밝기를 조절해봐요!</p>
+                    <div class="code-box">
+<code>#include &lt;WiFi.h&gt;
+#include &lt;WebServer.h&gt;
+
+const char* ssid = "ESP32-UTTEC";
+const char* password = "12345678";
+
+const int LED_PIN = 2;
+int brightness = 128;
+
+WebServer server(80);
+
+void handleRoot() {
+  String html = "&lt;html&gt;&lt;head&gt;";
+  html += "&lt;meta charset='UTF-8'&gt;";
+  html += "&lt;meta name='viewport' content='width=device-width'&gt;";
+  html += "&lt;style&gt;";
+  html += "body { font-family: Arial; text-align: center; ";
+  html += "background: linear-gradient(135deg, #e0f7fa, #80deea); padding: 50px; }";
+  html += ".container { background: white; padding: 40px; ";
+  html += "border-radius: 20px; max-width: 500px; margin: 0 auto; }";
+  html += "h1 { color: #00838f; }";
+  html += ".slider { width: 100%; height: 30px; }";
+  html += ".brightness-value { font-size: 48px; color: #00acc1; ";
+  html += "margin: 20px 0; font-weight: bold; }";
+  html += "&lt;/style&gt;&lt;/head&gt;&lt;body&gt;";
+  html += "&lt;div class='container'&gt;";
+  html += "&lt;h1&gt;LED 밝기 조절&lt;/h1&gt;";
+  html += "&lt;div class='brightness-value'&gt;" + String(brightness) + "&lt;/div&gt;";
+  html += "&lt;input type='range' min='0' max='255' value='" + String(brightness) + "' ";
+  html += "class='slider' ";
+  html += "onchange=\"location.href='/brightness?val='+this.value\"&gt;";
+  html += "&lt;p&gt;슬라이더를 움직여보세요!&lt;/p&gt;";
+  html += "&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;";
+
+  server.send(200, "text/html", html);
+}
+
+void handleBrightness() {
+  if(server.hasArg("val")) {
+    brightness = server.arg("val").toInt();
+    analogWrite(LED_PIN, brightness);
+    Serial.print("밝기: ");
+    Serial.println(brightness);
+  }
+
+  server.sendHeader("Location", "/");
+  server.send(303);
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(LED_PIN, OUTPUT);
+
+  WiFi.softAP(ssid, password);
+  Serial.print("IP: ");
+  Serial.println(WiFi.softAPIP());
+
+  server.on("/", handleRoot);
+  server.on("/brightness", handleBrightness);
+  server.begin();
+}
+
+void loop() {
+  server.handleClient();
+}</code>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h4>🔘 활동 2: 버튼 상태 표시하기</h4>
+                    <p>물리 버튼의 상태를 웹 페이지에 표시해봐요!</p>
+                    <div class="code-box">
+<code>#include &lt;WiFi.h&gt;
+#include &lt;WebServer.h&gt;
+
+const char* ssid = "ESP32-UTTEC";
+const char* password = "12345678";
+
+const int BUTTON_PIN = 15;  // 버튼 연결 핀
+const int LED_PIN = 2;
+int brightness = 128;
+
+WebServer server(80);
+
+void handleRoot() {
+  int buttonState = digitalRead(BUTTON_PIN);
+
+  String html = "&lt;html&gt;&lt;head&gt;";
+  html += "&lt;meta charset='UTF-8'&gt;";
+  html += "&lt;meta name='viewport' content='width=device-width'&gt;";
+  html += "&lt;meta http-equiv='refresh' content='1'&gt;";  // 1초마다 새로고침
+  html += "&lt;style&gt;";
+  html += "body { font-family: Arial; text-align: center; ";
+  html += "background: linear-gradient(135deg, #e0f7fa, #80deea); padding: 30px; }";
+  html += ".container { background: white; padding: 30px; ";
+  html += "border-radius: 20px; max-width: 500px; margin: 0 auto; }";
+  html += "h1 { color: #00838f; }";
+  html += ".status-box { background: #e0f7fa; padding: 20px; ";
+  html += "border-radius: 10px; margin: 20px 0; }";
+  html += ".button-status { font-size: 36px; font-weight: bold; }";
+  html += ".pressed { color: #4caf50; }";
+  html += ".released { color: #999; }";
+  html += ".slider { width: 100%; height: 25px; }";
+  html += "&lt;/style&gt;&lt;/head&gt;&lt;body&gt;";
+  html += "&lt;div class='container'&gt;";
+  html += "&lt;h1&gt;IoT 제어판&lt;/h1&gt;";
+
+  // 버튼 상태 표시
+  html += "&lt;div class='status-box'&gt;";
+  html += "&lt;h3&gt;버튼 상태&lt;/h3&gt;";
+  html += "&lt;div class='button-status " + String(buttonState ? "pressed" : "released") + "'&gt;";
+  html += buttonState ? "눌림 🔴" : "안 눌림 ⚪";
+  html += "&lt;/div&gt;&lt;/div&gt;";
+
+  // LED 밝기 조절
+  html += "&lt;div class='status-box'&gt;";
+  html += "&lt;h3&gt;LED 밝기: " + String(brightness) + "&lt;/h3&gt;";
+  html += "&lt;input type='range' min='0' max='255' value='" + String(brightness) + "' ";
+  html += "class='slider' ";
+  html += "onchange=\"location.href='/brightness?val='+this.value\"&gt;";
+  html += "&lt;/div&gt;";
+
+  html += "&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;";
+
+  server.send(200, "text/html", html);
+}
+
+void handleBrightness() {
+  if(server.hasArg("val")) {
+    brightness = server.arg("val").toInt();
+    analogWrite(LED_PIN, brightness);
+  }
+
+  server.sendHeader("Location", "/");
+  server.send(303);
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);  // 풀업 저항 사용
+
+  WiFi.softAP(ssid, password);
+  Serial.print("IP: ");
+  Serial.println(WiFi.softAPIP());
+
+  server.on("/", handleRoot);
+  server.on("/brightness", handleBrightness);
+  server.begin();
+}
+
+void loop() {
+  server.handleClient();
+}</code>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h4>🎮 활동 3: 버튼으로 LED 토글</h4>
+                    <p>물리 버튼을 누르면 LED가 켜지고 꺼지도록 만들어봐요!</p>
+                    <div class="code-box">
+<code>bool ledState = false;
+bool lastButtonState = false;
+
+void loop() {
+  server.handleClient();
+
+  // 버튼 상태 읽기
+  bool currentButtonState = digitalRead(BUTTON_PIN);
+
+  // 버튼이 눌렸을 때 (상태 변화 감지)
+  if(currentButtonState == HIGH && lastButtonState == LOW) {
+    ledState = !ledState;
+    digitalWrite(LED_PIN, ledState);
+    Serial.println(ledState ? "LED ON" : "LED OFF");
+    delay(50);  // 디바운싱
+  }
+
+  lastButtonState = currentButtonState;
+}</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🚀</span>
+                    도전 과제
+                </h2>
+
+                <div class="challenge-box">
+                    <h3>🏆 스스로 해보기</h3>
+                    <ul>
+                        <li>🌟 여러 개의 슬라이더로 여러 LED 밝기 독립 제어</li>
+                        <li>🌟🌟 버튼을 몇 번 눌렀는지 세는 카운터 추가</li>
+                        <li>🌟🌟 슬라이더 값에 따라 배경색이 바뀌는 효과</li>
+                        <li>🌟🌟🌟 버튼을 길게 누르면 다른 동작 실행</li>
+                        <li>🌟🌟🌟 자동 밝기 조절 (버튼을 누르면 자동으로 페이드)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🎉</span>
+                    Week 2 완료!
+                </h2>
+
+                <div class="celebration-box">
+                    <h3>축하합니다!</h3>
+                    <p>WiFi와 웹 서버를 마스터했어요!</p>
+                    <p>이제 스마트폰으로 ESP32를 완전히 제어할 수 있어요!</p>
+                    <p>다음 주에는 센서와 디스플레이를 배워볼 거예요!</p>
+                </div>
+
+                <div class="concept-box">
+                    <h3>📝 Week 2 배운 내용 정리</h3>
+                    <p><strong>핵심 개념:</strong></p>
+                    <ul>
+                        <li>WiFi AP 모드와 Station 모드</li>
+                        <li>웹 서버 만들기와 HTML 생성</li>
+                        <li>URL 매개변수로 명령 전달</li>
+                        <li>웹에서 LED 제어하기</li>
+                        <li>슬라이더로 밝기 조절</li>
+                        <li>센서 값을 웹에 표시</li>
+                    </ul>
+                    <p style="margin-top: 20px;"><strong>만든 프로젝트:</strong></p>
+                    <ul>
+                        <li>ESP32 WiFi AP 설정</li>
+                        <li>웹 페이지 서비스</li>
+                        <li>LED ON/OFF 웹 제어</li>
+                        <li>다중 LED 제어 시스템</li>
+                        <li>밝기 조절 + 버튼 상태 표시</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">📝</span>
+                    정리하기
+                </h2>
+
+                <div class="concept-box">
+                    <h3>✅ 오늘 배운 내용</h3>
+                    <p>
+                        <strong>1. HTML 슬라이더:</strong> input type="range"로 밝기 조절
+                    </p>
+                    <p>
+                        <strong>2. digitalRead():</strong> 버튼이나 스위치 상태 읽기
+                    </p>
+                    <p>
+                        <strong>3. 양방향 통신:</strong> ESP32 상태를 웹에 표시
+                    </p>
+                    <p>
+                        <strong>4. 자동 새로고침:</strong> meta refresh로 실시간 업데이트
+                    </p>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <a href="../week2_summary.html" class="nav-button prev">⬅️ Week 2 목차로</a>
+                <a href="../day_9/README.html" class="nav-button prev">⬅️ Day 9: 다중 LED 웹 제어</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-logo">(주)UTTEC</div>
+            <p>IoT와 AI를 배우는 즐거운 여정</p>
+            <p>ESP32-WROOM AI Kit으로 미래를 만들어가요!</p>
+        </div>
+    </div>
+</body>
+</html>

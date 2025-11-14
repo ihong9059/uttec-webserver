@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1주차 - ESP32 기초와 LED 제어</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .uttec-logo {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: white;
+            color: #f5576c;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.3em;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        .week-intro {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .week-intro h2 {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .week-intro p {
+            font-size: 1.3em;
+            color: #2c3e50;
+            line-height: 1.8;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .day-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            border-top: 6px solid;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+        }
+
+        .day-card.day2 {
+            border-top-color: #e74c3c;
+            background: linear-gradient(135deg, #fff 0%, #ffe8e8 100%);
+        }
+
+        .day-card.day3 {
+            border-top-color: #f39c12;
+            background: linear-gradient(135deg, #fff 0%, #fff4e0 100%);
+        }
+
+        .day-card.day4 {
+            border-top-color: #3498db;
+            background: linear-gradient(135deg, #fff 0%, #e8f4ff 100%);
+        }
+
+        .day-card.day5 {
+            border-top-color: #9b59b6;
+            background: linear-gradient(135deg, #fff 0%, #f4e8ff 100%);
+        }
+
+        .day-number {
+            font-size: 3em;
+            font-weight: bold;
+            opacity: 0.1;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .day-card h3 {
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .day-card .emoji {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .day-card p {
+            color: #555;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .topics {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .topics li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #2c3e50;
+        }
+
+        .topics li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+
+        .projects {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .projects h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .project-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            margin: 5px;
+            transition: all 0.3s;
+            font-size: 0.95em;
+        }
+
+        .project-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+
+        .learning-goals {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 50px 0;
+        }
+
+        .learning-goals h2 {
+            color: #2c3e50;
+            font-size: 2.2em;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .goal-item {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .goal-item .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .goal-item h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .timeline {
+            margin: 50px 0;
+            position: relative;
+        }
+
+        .timeline h2 {
+            color: #2c3e50;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        footer .uttec-brand {
+            font-size: 2em;
+            font-weight: bold;
+            color: #f5576c;
+            margin-bottom: 15px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .nav-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 25px;
+            }
+
+            header h1 {
+                font-size: 2em;
+            }
+
+            .days-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .goals-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="uttec-logo">(주)UTTEC</div>
+            <h1>🚀 1주차 학습 여정</h1>
+            <p style="font-size: 1.4em; margin-top: 15px;">ESP32 기초와 LED 제어의 세계로!</p>
+        </header>
+
+        <div class="content">
+            <!-- 주차 소개 -->
+            <div class="week-intro">
+                <h2>💡 1주차에서 배울 내용</h2>
+                <p>
+                    ESP32 마이크로컨트롤러의 기초를 배우고,<br>
+                    LED를 제어하는 다양한 방법을 익혀요!<br>
+                    여러분의 첫 IoT 여행이 시작됩니다! ✨
+                </p>
+            </div>
+
+            <!-- 학습 목표 -->
+            <div class="learning-goals">
+                <h2>🎯 이번 주 학습 목표</h2>
+                <div class="goals-grid">
+                    <div class="goal-item">
+                        <div class="icon">🔌</div>
+                        <h3>하드웨어 이해</h3>
+                        <p>ESP32 보드와 LED의 연결 방법을 배워요</p>
+                    </div>
+                    <div class="goal-item">
+                        <div class="icon">💻</div>
+                        <h3>프로그래밍 기초</h3>
+                        <p>Arduino IDE로 코드를 작성하고 업로드해요</p>
+                    </div>
+                    <div class="goal-item">
+                        <div class="icon">🌟</div>
+                        <h3>PWM 제어</h3>
+                        <p>LED 밝기를 자유롭게 조절하는 방법을 익혀요</p>
+                    </div>
+                    <div class="goal-item">
+                        <div class="icon">🎨</div>
+                        <h3>창의적 응용</h3>
+                        <p>배운 내용으로 멋진 LED 효과를 만들어요</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 일별 학습 내용 -->
+            <div class="timeline">
+                <h2>📅 일별 학습 계획</h2>
+                <div class="days-grid">
+                    <!-- Day 2 -->
+                    <div class="day-card day2">
+                        <div class="day-number">2</div>
+                        <span class="emoji">💡</span>
+                        <h3>Day 2: LED 밝기 조절하기</h3>
+                        <p>PWM을 사용해서 LED가 숨쉬듯이 밝아지고 어두워지는 효과를 만들어요!</p>
+                        <ul class="topics">
+                            <li>PWM (Pulse Width Modulation) 원리</li>
+                            <li>analogWrite 함수 사용법</li>
+                            <li>Fade In/Out 효과 구현</li>
+                            <li>밝기 단계 조절하기</li>
+                        </ul>
+                        <div class="projects">
+                            <h4>📂 프로젝트</h4>
+                            <a href="day_2/README.html" class="project-link">day2 - LED Fade</a>
+                        </div>
+                    </div>
+
+                    <!-- Day 3 -->
+                    <div class="day-card day3">
+                        <div class="day-number">3</div>
+                        <span class="emoji">🔆</span>
+                        <h3>Day 3: LED 패턴 만들기</h3>
+                        <p>여러 개의 LED를 순차적으로 제어해서 멋진 패턴을 만들어요!</p>
+                        <ul class="topics">
+                            <li>여러 LED 동시 제어</li>
+                            <li>순차 점등 패턴</li>
+                            <li>배열과 반복문 활용</li>
+                            <li>타이밍 제어</li>
+                        </ul>
+                        <div class="projects">
+                            <h4>📂 프로젝트</h4>
+                            <a href="day_3/README.html" class="project-link">day3 - LED Pattern</a>
+                        </div>
+                    </div>
+
+                    <!-- Day 4 -->
+                    <div class="day-card day4">
+                        <div class="day-number">4</div>
+                        <span class="emoji">🎯</span>
+                        <h3>Day 4: LED 제어 심화</h3>
+                        <p>더 복잡한 LED 제어 기법을 배우고 응용해요!</p>
+                        <ul class="topics">
+                            <li>밝기 조절의 고급 기법</li>
+                            <li>비선형 밝기 변화</li>
+                            <li>다양한 LED 효과</li>
+                            <li>코드 최적화</li>
+                        </ul>
+                        <div class="projects">
+                            <h4>📂 프로젝트</h4>
+                            <a href="day_4/README.html" class="project-link">day4 - Advanced LED</a>
+                        </div>
+                    </div>
+
+                    <!-- Day 5 -->
+                    <div class="day-card day5">
+                        <div class="day-number">5</div>
+                        <span class="emoji">🌈</span>
+                        <h3>Day 5: 종합 프로젝트</h3>
+                        <p>이번 주에 배운 모든 내용을 활용해서 나만의 LED 쇼를 만들어요!</p>
+                        <ul class="topics">
+                            <li>종합 LED 제어 프로그램</li>
+                            <li>창의적인 패턴 디자인</li>
+                            <li>문제 해결 능력</li>
+                            <li>프로젝트 발표</li>
+                        </ul>
+                        <div class="projects">
+                            <h4>📂 프로젝트</h4>
+                            <a href="day_5/README.html" class="project-link">day5 - LED Show</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 네비게이션 버튼 -->
+            <div class="nav-buttons">
+                <a href="../index.html" class="nav-btn">🏠 메인으로</a>
+                <a href="../week_2/week2_summary.html" class="nav-btn">다음 주 →</a>
+            </div>
+        </div>
+
+        <footer>
+            <div class="uttec-brand">⚡ (주)UTTEC</div>
+            <p style="font-size: 1.2em;">초등학생을 위한 IoT 코딩 교육</p>
+            <p style="margin-top: 15px; opacity: 0.8;">함께 배우고, 만들고, 성장해요!</p>
+            <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.7;">
+                © 2024 UTTEC. All rights reserved.
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

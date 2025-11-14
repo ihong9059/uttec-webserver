@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 2: LED 밝기 조절하기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .uttec-logo {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: white;
+            color: #f5576c;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #f5576c;
+        }
+
+        .goal-box {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 3px solid #fdcb6e;
+        }
+
+        .goal-box h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .goal-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .goal-box li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        .goal-box li:before {
+            content: "✨";
+            position: absolute;
+            left: 0;
+            font-size: 1.2em;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .concept-box h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .led-demo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .led-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #ff0000;
+            box-shadow: 0 0 30px rgba(255,0,0,0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.2; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        .arrow {
+            font-size: 2em;
+            color: #667eea;
+        }
+
+        .code-box {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .code-box pre {
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .comment {
+            color: #95a5a6;
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 8px solid #fcb69f;
+        }
+
+        .activity-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+            counter-reset: step-counter;
+        }
+
+        .step-list li {
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 10px;
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 60px;
+        }
+
+        .step-list li:before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .tip-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .tip-box strong {
+            color: #856404;
+            font-size: 1.2em;
+        }
+
+        .fun-fact {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .fun-fact h3 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        footer .uttec-brand {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #f5576c;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .led-demo {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="uttec-logo">(주)UTTEC</div>
+            <h1>💡 Day 2: LED 밝기 조절하기</h1>
+            <p style="font-size: 1.2em; margin-top: 10px;">빛나는 LED로 멋진 효과 만들기!</p>
+        </header>
+
+        <div class="content">
+            <!-- 학습 목표 -->
+            <div class="section">
+                <h2 class="section-title">🎯 오늘 배울 내용</h2>
+                <div class="goal-box">
+                    <h3>학습 목표</h3>
+                    <ul>
+                        <li>LED가 어떻게 밝아지고 어두워지는지 알아보기</li>
+                        <li>PWM(Pulse Width Modulation)의 마법 배우기</li>
+                        <li>빨간 LED로 숨쉬는 효과 만들기</li>
+                        <li>analogWrite 함수 사용하기</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- PWM 개념 -->
+            <div class="section">
+                <h2 class="section-title">🌟 PWM이란 무엇일까?</h2>
+                <div class="concept-box">
+                    <h3>PWM (Pulse Width Modulation)</h3>
+                    <p style="font-size: 1.1em; margin-bottom: 15px; color: #2c3e50;">
+                        PWM은 "빠르게 켜고 끄기"를 반복해서 LED의 밝기를 조절하는 방법이에요!
+                    </p>
+                    <p style="font-size: 1.1em; color: #2c3e50;">
+                        마치 선풍기를 빠르게 돌리면 바람이 세게 느껴지는 것처럼,
+                        LED를 빠르게 켜고 끄면 우리 눈에는 밝기가 달라 보여요.
+                    </p>
+                </div>
+
+                <div class="led-demo">
+                    <div>
+                        <div class="led-circle" style="opacity: 0.3;"></div>
+                        <p style="text-align: center; margin-top: 10px; font-weight: bold;">어두움 (30%)</p>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div>
+                        <div class="led-circle" style="opacity: 0.6;"></div>
+                        <p style="text-align: center; margin-top: 10px; font-weight: bold;">중간 (60%)</p>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div>
+                        <div class="led-circle" style="opacity: 1;"></div>
+                        <p style="text-align: center; margin-top: 10px; font-weight: bold;">밝음 (100%)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 코드 설명 -->
+            <div class="section">
+                <h2 class="section-title">💻 프로그램 코드</h2>
+                <div class="code-box">
+<pre><span class="comment">// ESP32-WROOM : Red LED Fade In/Out (1초 주기)</span>
+<span class="comment">// GPIO 25번 핀에 Red LED 연결</span>
+
+#define RED_LED 25
+
+void setup() {
+  pinMode(RED_LED, OUTPUT);
+}
+
+void loop() {
+  <span class="comment">// LED 밝아짐 (0 → 255, 약 1초)</span>
+  for (int i = 0; i <= 255; i++) {
+    analogWrite(RED_LED, i);   <span class="comment">// 0~255 : PWM 듀티비</span>
+    delay(4);                  <span class="comment">// 4ms 대기</span>
+  }
+
+  <span class="comment">// LED 어두워짐 (255 → 0, 약 1초)</span>
+  for (int i = 255; i >= 0; i--) {
+    analogWrite(RED_LED, i);
+    delay(4);
+  }
+}</pre>
+                </div>
+
+                <div class="tip-box">
+                    <strong>💡 코드 설명</strong>
+                    <ul style="margin-top: 10px; padding-left: 20px;">
+                        <li><strong>analogWrite(핀, 값)</strong>: LED 밝기를 0~255 사이 값으로 설정해요</li>
+                        <li><strong>0</strong>: 완전히 꺼짐 (0%)</li>
+                        <li><strong>128</strong>: 중간 밝기 (50%)</li>
+                        <li><strong>255</strong>: 최대 밝기 (100%)</li>
+                        <li><strong>delay(4)</strong>: 4밀리초(0.004초) 기다리기</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 실습 활동 -->
+            <div class="section">
+                <h2 class="section-title">🎨 실습 활동</h2>
+                <div class="activity-card">
+                    <h3>직접 해보기!</h3>
+                    <ol class="step-list">
+                        <li>ESP32 보드에 빨간 LED를 GPIO 25번 핀에 연결하세요</li>
+                        <li>Arduino IDE에서 코드를 작성하고 업로드하세요</li>
+                        <li>LED가 천천히 밝아졌다가 어두워지는 걸 관찰하세요</li>
+                        <li>delay(4)를 delay(10)으로 바꿔보세요. 어떻게 달라지나요?</li>
+                        <li>밝기 범위를 0~128로 바꿔보세요. 무슨 일이 일어날까요?</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 재미있는 사실 -->
+            <div class="section">
+                <div class="fun-fact">
+                    <h3>🌈 재미있는 사실!</h3>
+                    <p style="font-size: 1.2em; color: #2c3e50; margin-top: 10px;">
+                        우리가 보는 영화나 게임 화면도 비슷한 원리로 작동해요!
+                        화면의 픽셀이 빠르게 밝기를 바꾸면서 다양한 색을 만들어요.
+                        LED 하나로도 이런 멋진 효과를 만들 수 있다니 신기하죠? ✨
+                    </p>
+                </div>
+            </div>
+
+            <!-- 도전 과제 -->
+            <div class="section">
+                <h2 class="section-title">🚀 도전 과제</h2>
+                <div class="activity-card" style="background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);">
+                    <h3>창의력 발휘하기!</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 10px; background: white; margin: 10px 0; border-radius: 8px;">
+                            <strong>🎯 과제 1:</strong> LED가 빠르게 깜빡이는 효과 만들기
+                        </li>
+                        <li style="padding: 10px; background: white; margin: 10px 0; border-radius: 8px;">
+                            <strong>🎯 과제 2:</strong> 3개의 LED를 다른 속도로 깜빡이게 하기
+                        </li>
+                        <li style="padding: 10px; background: white; margin: 10px 0; border-radius: 8px;">
+                            <strong>🎯 과제 3:</strong> 촛불처럼 불규칙하게 흔들리는 효과 만들기
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="uttec-brand">⚡ (주)UTTEC</div>
+            <p>IoT와 함께하는 신나는 코딩 수업</p>
+            <p style="margin-top: 10px; opacity: 0.8;">배우고, 만들고, 즐기자!</p>
+        </footer>
+    </div>
+</body>
+</html>

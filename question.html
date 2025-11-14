@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>질문하기 - UTTEC AI 교육</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            padding: 50px;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1.05em;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        button {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+        }
+        .btn-back {
+            background: #f0f0f0;
+            color: #666;
+        }
+        .btn-back:hover {
+            background: #e0e0e0;
+        }
+        .success-message, .error-message {
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+            font-weight: 500;
+        }
+        .success-message {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 2px solid #4caf50;
+        }
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            border: 2px solid #f44336;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .info-box ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        .info-box li {
+            margin: 8px 0;
+            color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✉️ 질문하기</h1>
+        <p class="subtitle">궁금한 점을 남겨주세요. 선생님이 답변해드립니다!</p>
+
+        <div class="success-message" id="successMessage">
+            ✅ 질문이 성공적으로 제출되었습니다!<br>
+            답변은 이메일로 발송됩니다.
+        </div>
+
+        <div class="error-message" id="errorMessage">
+            ❌ 오류가 발생했습니다. 다시 시도해주세요.
+        </div>
+
+        <div class="info-box">
+            <strong>💡 질문 작성 팁</strong>
+            <ul>
+                <li>어떤 주차, 어느 날의 내용인지 적어주세요</li>
+                <li>어떤 문제가 발생했는지 구체적으로 설명해주세요</li>
+                <li>에러 메시지가 있다면 함께 적어주세요</li>
+                <li>실시간으로 답변이 필요하면 채팅 기능을 이용하세요!</li>
+            </ul>
+        </div>
+
+        <form id="questionForm">
+            <div class="form-group">
+                <label for="name">이름 *</label>
+                <input type="text" id="name" name="student_name" required placeholder="홍길동">
+            </div>
+
+            <div class="form-group">
+                <label for="email">이메일 *</label>
+                <input type="email" id="email" name="student_email" required placeholder="hong@example.com">
+            </div>
+
+            <div class="form-group">
+                <label for="category">카테고리</label>
+                <select id="category" name="category">
+                    <option value="week1">Week 1 - ESP32 기초와 LED 제어</option>
+                    <option value="week2">Week 2 - WiFi와 웹 제어</option>
+                    <option value="week3">Week 3 - 센서와 종합 프로젝트</option>
+                    <option value="general">기타 질문</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="subject">질문 제목 *</label>
+                <input type="text" id="subject" name="subject" required placeholder="LED가 켜지지 않아요">
+            </div>
+
+            <div class="form-group">
+                <label for="content">질문 내용 *</label>
+                <textarea id="content" name="content" required placeholder="Week 1 Day 2를 따라했는데 LED가 켜지지 않습니다. 코드는 정확히 입력했는데 실행하면 아무 일도 일어나지 않아요. 도와주세요!"></textarea>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn-back" onclick="history.back()">← 돌아가기</button>
+                <button type="submit" class="btn-submit">✉️ 질문 제출</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('questionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+
+            const submitButton = e.target.querySelector('.btn-submit');
+            submitButton.disabled = true;
+            submitButton.textContent = '전송 중...';
+
+            try {
+                const response = await fetch('/api/questions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('errorMessage').style.display = 'none';
+                    e.target.reset();
+                    window.scrollTo(0, 0);
+
+                    setTimeout(() => {
+                        document.getElementById('successMessage').style.display = 'none';
+                    }, 5000);
+                } else {
+                    throw new Error(result.error || 'Unknown error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('successMessage').style.display = 'none';
+                document.getElementById('errorMessage').innerHTML = 
+                    '❌ 오류가 발생했습니다: ' + error.message + '<br>다시 시도해주세요.';
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = '✉️ 질문 제출';
+            }
+        });
+    </script>
+</body>
+</html>

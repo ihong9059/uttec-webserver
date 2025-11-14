@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 13: 온습도 센서</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            background: linear-gradient(135deg, #74b9ff 0%, #a29bfe 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .uttec-logo {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: white;
+            color: #74b9ff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #74b9ff;
+        }
+
+        .goal-box {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 3px solid #fdcb6e;
+        }
+
+        .goal-box h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .goal-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .goal-box li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        .goal-box li:before {
+            content: "✨";
+            position: absolute;
+            left: 0;
+            font-size: 1.2em;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .concept-box h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .sensor-demo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .gauge {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .gauge-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .gauge-label {
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        .arrow {
+            font-size: 2em;
+            color: #667eea;
+        }
+
+        .code-box {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .code-box pre {
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .comment {
+            color: #95a5a6;
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 8px solid #fed6e3;
+        }
+
+        .activity-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+            counter-reset: step-counter;
+        }
+
+        .step-list li {
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 10px;
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 60px;
+        }
+
+        .step-list li:before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #74b9ff 0%, #a29bfe 100%);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .tip-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .tip-box strong {
+            color: #856404;
+            font-size: 1.2em;
+        }
+
+        .fun-fact {
+            background: linear-gradient(135deg, #c6ffdd 0%, #ffc1cc 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .fun-fact h3 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        footer .uttec-brand {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #74b9ff;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .sensor-demo {
+                flex-direction: column;
+            }
+
+            .gauge {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="uttec-logo">(주)UTTEC</div>
+            <h1>🌡️ Day 13: 온습도 센서</h1>
+            <p style="font-size: 1.2em; margin-top: 10px;">AHT20 센서로 주변의 온도와 습도를 측정해보자!</p>
+        </header>
+
+        <div class="content">
+            <!-- 학습 목표 -->
+            <div class="section">
+                <h2 class="section-title">🎯 오늘 배울 내용</h2>
+                <div class="goal-box">
+                    <h3>학습 목표</h3>
+                    <ul>
+                        <li>센서(Sensor)가 무엇인지 알아보기</li>
+                        <li>AHT20 온습도 센서 사용하기</li>
+                        <li>I2C 통신으로 센서 데이터 읽기</li>
+                        <li>웹 페이지에 실시간 측정값 표시하기</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 센서 개념 -->
+            <div class="section">
+                <h2 class="section-title">🌟 센서란 무엇일까?</h2>
+                <div class="concept-box">
+                    <h3>Sensor (센서) - 세상을 감지하는 눈과 귀!</h3>
+                    <p style="font-size: 1.1em; margin-bottom: 15px; color: #2c3e50;">
+                        센서는 "우리 주변의 현상을 측정하는 장치"예요!
+                    </p>
+                    <p style="font-size: 1.1em; color: #2c3e50;">
+                        온도를 재는 온도계, 밝기를 재는 조도센서, 움직임을 감지하는 센서...
+                        스마트폰의 가속도계도 센서고, 카메라의 CMOS도 센서예요.
+                        오늘은 AHT20라는 초소형 센서로 온도와 습도를 동시에 측정해볼 거예요!
+                    </p>
+                </div>
+
+                <div class="sensor-demo">
+                    <div style="text-align: center;">
+                        <p style="font-weight: bold; margin-bottom: 15px;">🌡️ 온도 센서</p>
+                        <div class="gauge">
+                            <div class="gauge-value">24°C</div>
+                            <div class="gauge-label">온도</div>
+                        </div>
+                    </div>
+                    <div class="arrow">+</div>
+                    <div style="text-align: center;">
+                        <p style="font-weight: bold; margin-bottom: 15px;">💧 습도 센서</p>
+                        <div class="gauge" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                            <div class="gauge-value">55%</div>
+                            <div class="gauge-label">습도</div>
+                        </div>
+                    </div>
+                    <div class="arrow">=</div>
+                    <div style="text-align: center;">
+                        <p style="font-weight: bold; margin-bottom: 15px;">📊 AHT20 센서</p>
+                        <div class="gauge" style="background: linear-gradient(135deg, #74b9ff 0%, #a29bfe 100%);">
+                            <div style="font-size: 2.5em; margin: 10px 0;">📡</div>
+                            <div class="gauge-label">2-in-1</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 코드 설명 -->
+            <div class="section">
+                <h2 class="section-title">💻 프로그램 코드</h2>
+                <div class="code-box">
+<pre><span class="comment">// ESP32 + AHT20 온습도 센서 + 웹 서버</span>
+
+#include &lt;WiFi.h&gt;
+#include &lt;Adafruit_AHTX0.h&gt;
+
+const char* ssid = "ESP32_SENSOR";
+const char* password = "12345678";
+
+Adafruit_AHTX0 aht;
+WiFiServer server(80);
+
+void setup() {
+  Serial.begin(115200);
+
+  <span class="comment">// AHT20 센서 초기화</span>
+  if (!aht.begin()) {
+    Serial.println("AHT20 센서를 찾을 수 없습니다!");
+    while (1) delay(10);
+  }
+
+  WiFi.softAP(ssid, password);
+  server.begin();
+  Serial.println("센서 서버 시작!");
+}
+
+void loop() {
+  <span class="comment">// 센서에서 데이터 읽기</span>
+  sensors_event_t humidity, temp;
+  aht.getEvent(&humidity, &temp);
+
+  float temperature = temp.temperature;
+  float humidity_value = humidity.relative_humidity;
+
+  Serial.print("온도: ");
+  Serial.print(temperature);
+  Serial.print(" °C, 습도: ");
+  Serial.print(humidity_value);
+  Serial.println(" %");
+
+  <span class="comment">// 웹 클라이언트 처리</span>
+  WiFiClient client = server.available();
+
+  if (client) {
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-type:text/html");
+    client.println();
+
+    client.println("&lt;h1&gt;센서 측정값&lt;/h1&gt;");
+    client.print("&lt;h2&gt;온도: ");
+    client.print(temperature);
+    client.println(" °C&lt;/h2&gt;");
+    client.print("&lt;h2&gt;습도: ");
+    client.print(humidity_value);
+    client.println(" %&lt;/h2&gt;");
+
+    client.stop();
+  }
+
+  delay(2000);
+}</pre>
+                </div>
+
+                <div class="tip-box">
+                    <strong>💡 코드 설명</strong>
+                    <ul style="margin-top: 10px; padding-left: 20px;">
+                        <li><strong>Adafruit_AHTX0</strong>: AHT20 센서를 쉽게 사용할 수 있게 하는 라이브러리</li>
+                        <li><strong>aht.begin()</strong>: 센서 초기화</li>
+                        <li><strong>aht.getEvent()</strong>: 센서에서 온도와 습도 값 읽기</li>
+                        <li><strong>temperature</strong>: 온도 값 (℃)</li>
+                        <li><strong>relative_humidity</strong>: 습도 값 (%)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 실습 활동 -->
+            <div class="section">
+                <h2 class="section-title">🎨 실습 활동</h2>
+                <div class="activity-card">
+                    <h3>직접 해보기!</h3>
+                    <ol class="step-list">
+                        <li>ESP32의 SDA(GPIO 21)와 SCL(GPIO 22)에 AHT20 센서를 연결하세요</li>
+                        <li>Arduino IDE에서 Adafruit AHTX0 라이브러리를 설치하세요</li>
+                        <li>코드를 업로드하고 시리얼 모니터를 열어서 센서 값을 확인하세요</li>
+                        <li>웹 브라우저에서 192.168.4.1로 접속해서 온습도 값을 확인하세요</li>
+                        <li>손으로 센서를 만져보세요. 온도와 습도가 어떻게 변하나요?</li>
+                        <li>선풍기 바람을 센서에 불어보세요. 습도가 변하나요?</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 재미있는 사실 -->
+            <div class="section">
+                <div class="fun-fact">
+                    <h3>🌈 재미있는 사실!</h3>
+                    <p style="font-size: 1.2em; color: #2c3e50; margin-top: 10px;">
+                        AHT20 센서는 크기가 3mm x 3mm 정도로 매우 작지만,
+                        정확도가 매우 높아서 날씨 예측 기계, 에어컨 자동조절,
+                        박물관의 유물 보관 조건 관리 등에 사용돼요!
+                        또한 스마트시티에서는 수백 개의 이런 센서로 도시의 환경을 24시간 감시한답니다! 🏙️
+                    </p>
+                </div>
+            </div>
+
+            <!-- 도전 과제 -->
+            <div class="section">
+                <h2 class="section-title">🚀 도전 과제</h2>
+                <div class="activity-card" style="background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);">
+                    <h3>창의력 발휘하기!</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 10px; background: white; margin: 10px 0; border-radius: 8px;">
+                            <strong>🎯 과제 1:</strong> 웹 페이지에 온습도 게이지(막대)를 그려보기
+                        </li>
+                        <li style="padding: 10px; background: white; margin: 10px 0; border-radius: 8px;">
+                            <strong>🎯 과제 2:</strong> "습도가 80% 이상이면 LED 켜기" 기능 추가하기
+                        </li>
+                        <li style="padding: 10px; background: white; margin: 10px 0; border-radius: 8px;">
+                            <strong>🎯 과제 3:</strong> 매 초마다 센서값이 자동으로 새로고침되는 웹 페이지 만들기
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="uttec-brand">🌡️ (주)UTTEC</div>
+            <p>IoT와 함께하는 신나는 코딩 수업</p>
+            <p style="margin-top: 10px; opacity: 0.8;">배우고, 만들고, 즐기자!</p>
+        </footer>
+    </div>
+</body>
+</html>
